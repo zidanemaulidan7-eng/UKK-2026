@@ -1,62 +1,34 @@
-
 <?php
+// proses_login.php
 session_start();
-require_once "config/koneksi.php";
+include 'config/koneksi.php';
+$username = mysqli_real_escape_string($koneksi, $_POST['username']);
+$password = $_POST['password'];
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: login.php");
-    exit;
-}
+$email = mysqli_real_escape_string($koneksi, $_POST['email']);
 
-$email = trim($_POST['email'] ?? '');
-$password = $_POST['password'] ?? '';
+$sql = "SELECT * FROM t_users WHERE email = '$email'";
 
-if ($email === '' || $password === '') {
-    $_SESSION['pesan_error'] = "Email dan password wajib diisi.";
-    header("Location: login.php");
-    exit;
-}
+if (mysqli_num_rows($hasil) == 1) {
+    $data = mysqli_fetch_assoc($hasil);
 
-$sql = "SELECT id, name, email, password, role
-        FROM users
-        WHERE email = ?
-        LIMIT 1";
-
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $email);
-$stmt->execute();
-
-$result = $stmt->get_result();
-$data = $result->fetch_assoc();
-
-if (!$data || !password_verify($password, $data['password'])) {
-    $_SESSION['pesan_error'] = "Email atau password salah.";
-    header("Location: login.php");
-    exit;
-}
-
-$role = strtolower(trim($data['role']));
-
-if (!in_array($role, ['admin', 'guru'], true)) {
-    $_SESSION['pesan_error'] = "Role pengguna tidak valid.";
-    header("Location: login.php");
-    exit;
-}
-
-session_regenerate_id(true);
-
-$_SESSION['id_user'] = $data['id'];
-$_SESSION['nama_user'] = $data['name'];
+    if (password_verify($password, $data['password'])) {
+        // password cocok, buat session
+$_SESSION['login'] = true;
+$_SESSION['name'] = $data['nama'];
 $_SESSION['email'] = $data['email'];
-$_SESSION['role'] = $role;
+$_SESSION['role'] = $data['role'];
 
-$stmt->close();
-$conn->close();
 
-if ($role === 'admin') {
-    header("Location: dashboard_admin.php");
+        header('Location: dashboard.php');
+        exit;
+    } else {
+        $_SESSION['pesan_error'] = 'password salah!';
+        header('Location: login.php');
+        exit;
+    }
 } else {
-    header("Location: dashboard_guru.php");
+    $_SESSION['pesan_error'] = 'email tidak ditemukan!';
+    header('Location: login.php');
 }
-exit;
 ?>
