@@ -40,140 +40,179 @@ if (!$query_user) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <title>Kelola Guru</title>
 </head>
 <body>
 
-    <h1>Kelola Guru</h1>
+<div class="container-fluid">
+    <div class="row">
+        <!-- SIDEBAR -->
+        <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
+            <h4 class="text-white mb-4">
+                Website
+            </h4>
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item mb-2">
+                    <a href="dashboard.php" class="nav-link text-white">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="kelola_siswa.php" class="nav-link text-white">
+                        kelola Siswa
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="kelola_guru.php" class="nav-link active">kelola Guru</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="kelola_kelas.php" class="nav-link text-white">kelola Kelas</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
+                </li>
+                <hr class="text-secondary">
+                <li class="nav-item mb-2">
+                    <a href="logout.php" class="nav-link text-danger">Logout</a>
+                </li>
+            </ul>
+        </div>
 
-    <?php if (isset($_SESSION['pesan'])) { ?>
-        <p>
-            <?= htmlspecialchars($_SESSION['pesan']); ?>
-        </p>
-        <?php unset($_SESSION['pesan']); ?>
-    <?php } ?>
+        <!-- KONTEN UTAMA -->
+        <main class="col-md-9 col-lg-10 p-4">
+            <h2>Kelola Guru</h2>
 
-    <p>
-        <a href="dashboard.php">Kembali ke Dashboard</a>
-    </p>
-
-    <hr>
-
-    <h2>Tambah Data Guru</h2>
-
-    <form action="proses_guru.php" method="POST">
-        <input type="hidden" name="aksi" value="tambah">
-
-        <table>
-            <tr>
-                <td>NIP</td>
-                <td>:</td>
-                <td><input type="text" name="nip" required></td>
-            </tr>
-            <tr>
-                <td>Nama Guru</td>
-                <td>:</td>
-                <td><input type="text" name="nama" required></td>
-            </tr>
-            <tr>
-                <td>Email</td>
-                <td>:</td>
-                <td><input type="email" name="email" required></td>
-            </tr>
-            <tr>
-                <td>Akun Guru</td>
-                <td>:</td>
-                <td>
-                    <select name="user_id" required>
-                        <option value="">-- Pilih Akun Guru --</option>
-
-                        <?php while ($user = mysqli_fetch_assoc($query_user)) { ?>
-                            <option value="<?= $user['id']; ?>">
-                                <?= htmlspecialchars($user['name']); ?>
-                                - <?= htmlspecialchars($user['email']); ?>
-                            </option>
-                        <?php } ?>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Status Aktif</td>
-                <td>:</td>
-                <td>
-                    <select name="status_aktif" required>
-                        <option value="1">Aktif</option>
-                        <option value="0">Tidak Aktif</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <button type="submit">Tambah Guru</button>
-                </td>
-            </tr>
-        </table>
-    </form>
-
-    <hr>
-
-    <h2>Data Guru</h2>
-
-    <table border="1" cellpadding="8" cellspacing="0">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>NIP</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>User ID</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (mysqli_num_rows($query) > 0) { ?>
-                <?php while ($guru = mysqli_fetch_assoc($query)) { ?>
-                    <tr>
-                        <td><?= $guru['id']; ?></td>
-                        <td><?= htmlspecialchars($guru['nip']); ?></td>
-                        <td><?= htmlspecialchars($guru['nama']); ?></td>
-                        <td>
-                            <?= htmlspecialchars(
-                                $guru['email_user'] ?? $guru['email'] ?? '-'
-                            ); ?>
-                        </td>
-                        <td>
-                            <?= $guru['status_aktif'] == 1
-                                ? 'Aktif'
-                                : 'Tidak Aktif'; ?>
-                        </td>
-                        <td>
-                            <?= htmlspecialchars((string) ($guru['user_id'] ?? '-')); ?>
-                        </td>
-                        <td>
-                            <a href="edit_guru.php?id=<?= $guru['id']; ?>">
-                                Edit
-                            </a>
-                            |
-                            <a
-                                href="proses_guru.php?aksi=hapus&id=<?= $guru['id']; ?>"
-                                onclick="return confirm('Yakin ingin menghapus data guru ini?');"
-                            >
-                                Hapus
-                            </a>
-                        </td>
-                    </tr>
-                <?php } ?>
-            <?php } else { ?>
-                <tr>
-                    <td colspan="7">Belum ada data guru.</td>
-                </tr>
+            <?php if (isset($_SESSION['pesan'])) { ?>
+                <div class="alert alert-success mt-3">
+                    <?= htmlspecialchars($_SESSION['pesan']); ?>
+                </div>
+                <?php unset($_SESSION['pesan']); ?>
             <?php } ?>
-        </tbody>
-    </table>
 
-    <p><a href="logout.php">Logout</a></p>
+            <hr>
+
+            <h4 class="mb-3">Tambah Data Guru</h4>
+
+            <form action="proses_guru.php" method="POST">
+                <input type="hidden" name="aksi" value="tambah">
+
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">NIP</label>
+                    <div class="col-sm-6">
+                        <input type="text" name="nip" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Nama Guru</label>
+                    <div class="col-sm-6">
+                        <input type="text" name="nama" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Email</label>
+                    <div class="col-sm-6">
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Akun Guru</label>
+                    <div class="col-sm-6">
+                        <select name="user_id" class="form-control" required>
+                            <option value="">-- Pilih Akun Guru --</option>
+                            <?php while ($user = mysqli_fetch_assoc($query_user)) { ?>
+                                <option value="<?= $user['id']; ?>">
+                                    <?= htmlspecialchars($user['name']); ?> - <?= htmlspecialchars($user['email']); ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Status Aktif</label>
+                    <div class="col-sm-6">
+                        <select name="status_aktif" class="form-control" required>
+                            <option value="1">Aktif</option>
+                            <option value="0">Tidak Aktif</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-sm-6 offset-sm-2">
+                        <button type="submit" class="btn btn-primary">Tambah Guru</button>
+                    </div>
+                </div>
+            </form>
+
+            <hr class="my-4">
+
+            <h4 class="mb-3">Data Guru</h4>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>NIP</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>User ID</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (mysqli_num_rows($query) > 0) { ?>
+                            <?php while ($guru = mysqli_fetch_assoc($query)) { ?>
+                                <tr>
+                                    <td><?= $guru['id']; ?></td>
+                                    <td><?= htmlspecialchars($guru['nip']); ?></td>
+                                    <td><?= htmlspecialchars($guru['nama']); ?></td>
+                                    <td>
+                                        <?= htmlspecialchars(
+                                            $guru['email_user'] ?? $guru['email'] ?? '-'
+                                        ); ?>
+                                    </td>
+                                    <td>
+                                        <?= $guru['status_aktif'] == 1
+                                            ? 'Aktif'
+                                            : 'Tidak Aktif'; ?>
+                                    </td>
+                                    <td>
+                                        <?= htmlspecialchars((string) ($guru['user_id'] ?? '-')); ?>
+                                    </td>
+                                    <td>
+                                        <a href="edit_guru.php?id=<?= $guru['id']; ?>" class="btn btn-warning btn-sm mb-1">
+                                            Edit
+                                        </a>
+                                        <a href="proses_guru.php?aksi=hapus&id=<?= $guru['id']; ?>"
+                                           class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Yakin ingin menghapus data guru ini?');">
+                                            Hapus
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <tr>
+                                <td colspan="7" class="text-center">Belum ada data guru.</td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
 
 </body>
 </html>
-```

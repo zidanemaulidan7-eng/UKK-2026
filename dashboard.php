@@ -1,3 +1,7 @@
+<?php
+
+include 'includes/cek_session.php';
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,7 +17,7 @@
         <!-- SIDEBAR -->
         <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
             <h4 class="text-white mb-4">
-                My Website
+                Website
             </h4>
             <ul class="nav nav-pills flex-column">
                 <li class="nav-item mb-2">
@@ -22,16 +26,16 @@
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-    <a href="kelola_siswa.php" class="nav-link text-white">Data Siswa</a>
+    <a href="kelola_siswa.php" class="nav-link text-white">kelola Siswa</a>
 </li>
                 </li>
                 <li class="nav-item mb-2">
-    <a href="kelola_guru.php" class="nav-link text-white">Data Guru</a>
+    <a href="kelola_guru.php" class="nav-link text-white">kelola Guru</a>
 </li>
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-    <a href="kelola_kelas.php" class="nav-link text-white">Kelas</a>
+    <a href="kelola_kelas.php" class="nav-link text-white">kelola Kelas</a>
 </li>
                 <li class="nav-item mb-2">
     <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
@@ -106,56 +110,37 @@
     <a href="logout.php">Logout</a>
 </body>
 </html>
-<?php
-session_start();
-
-if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
-    header("Location: login.php");
-    exit;
-}
-
-$nama = $_SESSION['nama_lengkap'] ?? 'Pengguna';
-$role = $_SESSION['role'] ?? '';
-
-?>
-
 <!DOCTYPE html>
-
-
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard</title>
+    <title>dashboard-warung abcd</title>
 </head>
 <body>
+    <h1>selamat datang, <?php echo $_SESSION['name'];?></h1>
+    <p>anda login sebagai: <?php echo $_SESSION['role']?></p>
 
-    <h1>Dashboard Sistem Pelanggaran Siswa</h1>
+    <ul>
 
-    <p>Selamat datang, <?php echo htmlspecialchars($nama); ?>!</p>
-    <p>Role: <?php echo htmlspecialchars($role); ?></p>
+<?php if ($_SESSION['role'] == 'admin'  )  {?>
+<li><a href="dashboard.php">dashboard</a></li>
+      <li><a href="kelola_siswa.php">kelola siswa</a></li>
+      <li><a href="kelola_guru.php">kelola guru</a></li>
+      <li><a href="catatan_pelanggaran.php">catatan pelanggaran</a></li>
+           <li><a href="kelola_tahun_ajaran.php">kelola tahun ajaran</a></li>
+            <li><a href="kelola_kelas.php">kelola kelas</a></li>
+              <li><a href="kelola_wali_kelas.php">kelola wali kelas</a></li>
+                <li><a href="kelola_kategori_pelanggaran.php">kelola kategori pelanggaran</a></li>
+              <li><a href="kelola_penempatan_siswa.php">kelola penempatan siswa</a></li>
+             <li><a href="laporan.php">Laporan</a></li>
+              <li><a href="rekap_point.php">rekap point</a></li>
+            
+         <?php } ?>
 
-    <hr>
-
-    <?php if ($role === 'admin') { ?>
-
-        <h2>Menu Admin</h2>
-        <ul>
-            <li><a href="kelola_guru.php">kelola Guru</a></li>
-            <li><a href="kelola_kelas.php">kelola Kelas</a></li>
-            <li><a href="kelola_siswa.php">kelola Siswa</a></li>
-            <li><a href="pelanggaran.php">kelola Pelanggaran</a></li>
-            <li><a href="kelola_tahun_ajaran.php">kelola tahun ajaran</a></li>
-            <li><a href="kelola_wali_kelas.php">kelola wali kelas</a></li>
-            <li><a href="penempatan_siswa.php">penempatan siswa</a></li>
-        </ul>
-
-    <?php } else { ?>
-
-        <h2>Menu Pengguna</h2>
-        <p>Selamat menggunakan sistem.</p>
-
-    <?php } ?>
-
-    <p><a href="logout.php">Logout</a></p>
-
+    <?php if ($_SESSION['role'] == 'guru' ) { ?>
+      <li><a href="menu3.php">menu 3</a></li>
+           <li><a href="menu4.php">menu 4</a></li>
+<?php } ?>
+    </ul>
+    <a href="login.php">logout</a>
 </body>
 </html>
