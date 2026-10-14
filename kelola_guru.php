@@ -158,58 +158,55 @@ if (!$query_user) {
             <h4 class="mb-3">Data Guru</h4>
 
             <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>NIP</th>
-                            <th>Nama</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>User ID</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (mysqli_num_rows($query) > 0) { ?>
-                            <?php while ($guru = mysqli_fetch_assoc($query)) { ?>
-                                <tr>
-                                    <td><?= $guru['id']; ?></td>
-                                    <td><?= htmlspecialchars($guru['nip']); ?></td>
-                                    <td><?= htmlspecialchars($guru['nama']); ?></td>
-                                    <td>
-                                        <?= htmlspecialchars(
-                                            $guru['email_user'] ?? $guru['email'] ?? '-'
-                                        ); ?>
-                                    </td>
-                                    <td>
-                                        <?= $guru['status_aktif'] == 1
-                                            ? 'Aktif'
-                                            : 'Tidak Aktif'; ?>
-                                    </td>
-                                    <td>
-                                        <?= htmlspecialchars((string) ($guru['user_id'] ?? '-')); ?>
-                                    </td>
-                                    <td>
-                                        <a href="edit_guru.php?id=<?= $guru['id']; ?>" class="btn btn-warning btn-sm mb-1">
-                                            Edit
-                                        </a>
-                                        <a href="proses_guru.php?aksi=hapus&id=<?= $guru['id']; ?>"
-                                           class="btn btn-danger btn-sm"
-                                           onclick="return confirm('Yakin ingin menghapus data guru ini?');">
-                                            Hapus
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                        <?php } else { ?>
-                            <tr>
-                                <td colspan="7" class="text-center">Belum ada data guru.</td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>NIP</th>
+                <th>Nama</th>
+                <th>Email</th> <!-- Pastikan Email ada di sini -->
+                <th>Status</th>
+                <th>User ID</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if ($query && mysqli_num_rows($query) > 0) {
+                while ($guru = mysqli_fetch_assoc($query)) {
+            ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($guru['id']); ?></td>
+                    <td><?php echo htmlspecialchars($guru['nip']); ?></td>
+                    <td><?php echo htmlspecialchars($guru['nama']); ?></td>
+                    <!-- Pastikan urutan data di bawah ini sama persis dengan urutan th di atas -->
+                    <td><?php echo htmlspecialchars($guru['email'] ?? $guru['email_user'] ?? '-'); ?></td>
+                    <td>
+                        <?php 
+                        echo (isset($guru['status_aktif']) && $guru['status_aktif'] == 1) ? "Aktif" : "Tidak Aktif"; 
+                        ?>
+                    </td>
+                    <td><?php echo htmlspecialchars($guru['user_id']); ?></td>
+                    <td>
+                        <a href="edit_guru.php?id=<?php echo $guru['id']; ?>" class="btn btn-warning btn-sm mb-1">Edit</a>
+                        <a href="hapus_guru.php?id=<?php echo $guru['id']; ?>" 
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Yakin ingin menghapus data guru ini?')">
+                            Hapus
+                        </a>
+                    </td>
+                </tr>
+            <?php 
+                }
+            } else { 
+            ?>
+                <tr>
+                    <td colspan="7" class="text-center">Belum ada data guru.</td>
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+</div>
         </main>
     </div>
 </div>

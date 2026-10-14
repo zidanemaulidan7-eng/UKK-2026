@@ -73,7 +73,8 @@ $query = mysqli_query($koneksi, $sql);
 
             <h4 class="mb-3">Tambah Data Siswa</h4>
 
-            <form action="menu1.php" method="POST">
+            <!-- Diubah dari menu1.php ke proses_siswa.php agar tidak 404 -->
+            <form action="proses_siswa.php" method="POST">
                 <input type="hidden" name="aksi" value="tambah">
 
                 <div class="mb-3 row">
