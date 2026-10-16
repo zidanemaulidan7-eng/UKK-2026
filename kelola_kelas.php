@@ -29,7 +29,7 @@ if (!$query) {
         <!-- SIDEBAR -->
         <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
             <h4 class="text-white mb-4">
-                Website
+                pelanggaran siswa
             </h4>
             <ul class="nav nav-pills flex-column">
                 <li class="nav-item mb-2">
@@ -47,6 +47,15 @@ if (!$query) {
                 </li>
                 <li class="nav-item mb-2">
                     <a href="kelola_kelas.php" class="nav-link active">kelola Kelas</a>
+                </li>
+                <!-- Menu Kelola Tahun Ajaran yang ditambahkan -->
+                <li class="nav-item mb-2">
+                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
+                    <!-- Menu Kelola Wali Kelas ditambahkan di sini -->
+                <li class="nav-item mb-2">
+                    <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
+                    <li class="nav-item mb-2">
+                    <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
                 </li>
                 <li class="nav-item mb-2">
                     <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>

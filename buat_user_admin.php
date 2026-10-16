@@ -10,7 +10,8 @@ $role = 'admin';
 $sql = "INSERT INTO t_users (name, email, password, role)
         VALUES (?, ?, ?, ?)";
 
-$stmt = mysqli_prepare($conn, $sql);
+// Diperbaiki dari $conn menjadi $koneksi
+$stmt = mysqli_prepare($koneksi, $sql);
 
 mysqli_stmt_bind_param(
     $stmt,
@@ -26,7 +27,7 @@ if (mysqli_stmt_execute($stmt)) {
     echo "<br>Email: admin@gmail.com";
     echo "<br>Password: admin123";
 } else {
-    echo "Gagal membuat user: " . mysqli_error($conn);
+    echo "Gagal membuat user: " . mysqli_error($koneksi);
 }
 
 ?>

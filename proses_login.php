@@ -17,12 +17,14 @@ $sql = "SELECT * FROM t_users WHERE email = '$email'";
 $hasil = mysqli_query($koneksi, $sql);
 
 if (!$hasil) {
-    die("Query gagal: " . mysqli_error($conn));
+    die("Query gagal: " . mysqli_error($koneksi));
 }
 
-if (mysqli_num_rows($hasil) > 0)
+// Cek apakah email ditemukan di database
+if (mysqli_num_rows($hasil) > 0) {
     $data = mysqli_fetch_assoc($hasil);
 
+    // Verifikasi password
     if (password_verify($password, $data['password'])) {
         session_regenerate_id(true);
         $_SESSION['login'] = true;
@@ -30,9 +32,13 @@ if (mysqli_num_rows($hasil) > 0)
         $_SESSION['nama_lengkap'] = $data['name'];
         $_SESSION['role'] = $data['role'];
 
-    if ($data['role'] == 'admin') {
-        header("Location: dashboard.php");
-        exit;
+        if ($data['role'] == 'admin') {
+            header("Location: dashboard.php");
+            exit;
+        } else {
+            header("Location: dashboard.php");
+            exit;
+        }
     } else {
         echo "Password salah!";
     }

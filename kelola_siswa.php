@@ -24,7 +24,7 @@ $query = mysqli_query($koneksi, $sql);
         <!-- SIDEBAR -->
         <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
             <h4 class="text-white mb-4">
-                Website
+                Pelanggaran Siswa
             </h4>
             <ul class="nav nav-pills flex-column">
                 <li class="nav-item mb-2">
@@ -34,14 +34,23 @@ $query = mysqli_query($koneksi, $sql);
                 </li>
                 <li class="nav-item mb-2">
                     <a href="kelola_siswa.php" class="nav-link active">
-                        kelola Siswa
+                        Kelola Siswa
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a href="kelola_guru.php" class="nav-link text-white">kelola Guru</a>
+                    <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a href="kelola_kelas.php" class="nav-link text-white">kelola Kelas</a>
+                    <a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a>
+                </li>
+                <!-- Menu Kelola Tahun Ajaran yang ditambahkan -->
+                <li class="nav-item mb-2">
+                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
+                    <!-- Menu Kelola Wali Kelas ditambahkan di sini -->
+                <li class="nav-item mb-2">
+                    <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
+                <li class="nav-item mb-2">
+                    <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
                 </li>
                 <li class="nav-item mb-2">
                     <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
@@ -73,7 +82,6 @@ $query = mysqli_query($koneksi, $sql);
 
             <h4 class="mb-3">Tambah Data Siswa</h4>
 
-            <!-- Diubah dari menu1.php ke proses_siswa.php agar tidak 404 -->
             <form action="proses_siswa.php" method="POST">
                 <input type="hidden" name="aksi" value="tambah">
 

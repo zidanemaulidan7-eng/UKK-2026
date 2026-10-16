@@ -9,11 +9,11 @@ if ($_SESSION['role'] !== 'admin') {
 }
 
 // Ambil data guru beserta email akun user
-$sql = "SELECT
-            t_guru.*,
-            t_users.email AS email_user
-        FROM t_guru
-        LEFT JOIN t_users ON t_guru.user_id = t_users.id
+$sql = "SELECT 
+            t_guru.*, 
+            t_users.email AS email_user 
+        FROM t_guru 
+        LEFT JOIN t_users ON t_guru.user_id = t_users.id 
         ORDER BY t_guru.id DESC";
 
 $query = mysqli_query($koneksi, $sql);
@@ -23,9 +23,9 @@ if (!$query) {
 }
 
 // Ambil akun yang role-nya guru
-$sql_user = "SELECT id, name, email
-             FROM t_users
-             WHERE role = 'guru'
+$sql_user = "SELECT id, name, email 
+             FROM t_users 
+             WHERE role = 'guru' 
              ORDER BY name ASC";
 
 $query_user = mysqli_query($koneksi, $sql_user);
@@ -51,7 +51,7 @@ if (!$query_user) {
         <!-- SIDEBAR -->
         <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
             <h4 class="text-white mb-4">
-                Website
+                Pelanggaran Siswa
             </h4>
             <ul class="nav nav-pills flex-column">
                 <li class="nav-item mb-2">
@@ -61,14 +61,23 @@ if (!$query_user) {
                 </li>
                 <li class="nav-item mb-2">
                     <a href="kelola_siswa.php" class="nav-link text-white">
-                        kelola Siswa
+                        Kelola Siswa
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a href="kelola_guru.php" class="nav-link active">kelola Guru</a>
+                    <a href="kelola_guru.php" class="nav-link active">Kelola Guru</a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a href="kelola_kelas.php" class="nav-link text-white">kelola Kelas</a>
+                    <a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a>
+                </li>
+                <!-- Menu Kelola Tahun Ajaran yang disamakan -->
+                <li class="nav-item mb-2">
+                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
+                    <!-- Menu Kelola Wali Kelas ditambahkan di sini -->
+                <li class="nav-item mb-2">
+                    <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
+                <li class="nav-item mb-2">
+                    <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
                 </li>
                 <li class="nav-item mb-2">
                     <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
@@ -129,7 +138,7 @@ if (!$query_user) {
                             <option value="">-- Pilih Akun Guru --</option>
                             <?php while ($user = mysqli_fetch_assoc($query_user)) { ?>
                                 <option value="<?= $user['id']; ?>">
-                                    <?= htmlspecialchars($user['name']); ?> - <?= htmlspecialchars($user['email']); ?>
+                                    <?= htmlspecialchars($user['name']); ?> (<?= htmlspecialchars($user['email']); ?>)
                                 </option>
                             <?php } ?>
                         </select>
@@ -158,55 +167,54 @@ if (!$query_user) {
             <h4 class="mb-3">Data Guru</h4>
 
             <div class="table-responsive">
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>NIP</th>
-                <th>Nama</th>
-                <th>Email</th> <!-- Pastikan Email ada di sini -->
-                <th>Status</th>
-                <th>User ID</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            if ($query && mysqli_num_rows($query) > 0) {
-                while ($guru = mysqli_fetch_assoc($query)) {
-            ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($guru['id']); ?></td>
-                    <td><?php echo htmlspecialchars($guru['nip']); ?></td>
-                    <td><?php echo htmlspecialchars($guru['nama']); ?></td>
-                    <!-- Pastikan urutan data di bawah ini sama persis dengan urutan th di atas -->
-                    <td><?php echo htmlspecialchars($guru['email'] ?? $guru['email_user'] ?? '-'); ?></td>
-                    <td>
-                        <?php 
-                        echo (isset($guru['status_aktif']) && $guru['status_aktif'] == 1) ? "Aktif" : "Tidak Aktif"; 
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>NIP</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>User ID</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if ($query && mysqli_num_rows($query) > 0) {
+                            while ($guru = mysqli_fetch_assoc($query)) {
                         ?>
-                    </td>
-                    <td><?php echo htmlspecialchars($guru['user_id']); ?></td>
-                    <td>
-                        <a href="edit_guru.php?id=<?php echo $guru['id']; ?>" class="btn btn-warning btn-sm mb-1">Edit</a>
-                        <a href="hapus_guru.php?id=<?php echo $guru['id']; ?>" 
-                           class="btn btn-danger btn-sm"
-                           onclick="return confirm('Yakin ingin menghapus data guru ini?')">
-                            Hapus
-                        </a>
-                    </td>
-                </tr>
-            <?php 
-                }
-            } else { 
-            ?>
-                <tr>
-                    <td colspan="7" class="text-center">Belum ada data guru.</td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-</div>
+                            <tr>
+                                <td><?php echo htmlspecialchars($guru['id']); ?></td>
+                                <td><?php echo htmlspecialchars($guru['nip']); ?></td>
+                                <td><?php echo htmlspecialchars($guru['nama']); ?></td>
+                                <td><?php echo htmlspecialchars($guru['email'] ?? $guru['email_user'] ?? '-'); ?></td>
+                                <td>
+                                    <?php 
+                                    echo (isset($guru['status_aktif']) && $guru['status_aktif'] == 1) ? "Aktif" : "Tidak Aktif"; 
+                                    ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($guru['user_id']); ?></td>
+                                <td>
+                                    <a href="edit_guru.php?id=<?php echo $guru['id']; ?>" class="btn btn-warning btn-sm mb-1">Edit</a>
+                                    <a href="hapus_guru.php?id=<?php echo $guru['id']; ?>" 
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Yakin ingin menghapus data guru ini?')">
+                                        Hapus
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php 
+                            }
+                        } else { 
+                        ?>
+                            <tr>
+                                <td colspan="7" class="text-center">Belum ada data guru.</td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
         </main>
     </div>
 </div>
