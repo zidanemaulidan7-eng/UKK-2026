@@ -23,6 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
         }
     }
 }
+
+// Ambil semua data siswa terlebih dahulu ke dalam array
+$data_siswa = [];
+$q_all_siswa = mysqli_query($koneksi, "SELECT * FROM t_siswa ORDER BY id DESC");
+if ($q_all_siswa) {
+    while ($s = mysqli_fetch_assoc($q_all_siswa)) {
+        $data_siswa[] = $s;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -77,26 +86,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
                     </thead>
                     <tbody>
                         <?php
-                        // Ambil seluruh data dari tabel t_pelanggaran
                         $query = "SELECT * FROM t_pelanggaran ORDER BY id DESC";
                         $result = mysqli_query($koneksi, $query);
 
                         if ($result && mysqli_num_rows($result) > 0) {
-                            $no = 1;
+                            $index = 0;
                             while ($row = mysqli_fetch_assoc($result)) {
-                                // Deteksi berbagai kemungkinan nama kolom ID siswa di database
-                                $id_s = $row['id_siswa'] ?? $row['siswa_id'] ?? $row['nis'] ?? $row['id_t_siswa'] ?? 0;
                                 
-                                // Cari nama siswa berdasarkan ID ke tabel t_siswa
-                                $nama_siswa = "Siswa Tidak Ditemukan";
+                                // Deteksi ID/NIS siswa dari t_pelanggaran
+                                $id_s = $row['id_siswa'] ?? $row['siswa_id'] ?? $row['nis'] ?? $row['id_t_siswa'] ?? 0;
+                                $nama_siswa = "";
+
+                                // 1. Cari via ID / NIS jika cocok
                                 if (!empty($id_s)) {
-                                    $q_siswa = mysqli_query($koneksi, "SELECT * FROM t_siswa WHERE id = '$id_s' OR nis = '$id_s' OR id_siswa = '$id_s'");
+                                    $q_siswa = mysqli_query($koneksi, "SELECT * FROM t_siswa WHERE id = '$id_s' OR nis = '$id_s'");
                                     if ($q_siswa && $d_siswa = mysqli_fetch_assoc($q_siswa)) {
-                                        $nama_siswa = $d_siswa['nama'] ?? $d_siswa['nama_siswa'] ?? $d_siswa['nama_lengkap'] ?? 'Siswa Tanpa Nama';
+                                        $nama_siswa = $d_siswa['nama'] ?? $d_siswa['nama_siswa'] ?? $d_siswa['nama_lengkap'] ?? '';
                                     }
                                 }
 
-                                // Deteksi berbagai kemungkinan nama kolom deskripsi pelanggaran di database
+                                // 2. Fallback Otomatis: Ambil nama dari array $data_siswa jika relasi database 0/tidak cocok
+                                if (empty($nama_siswa)) {
+                                    if (isset($data_siswa[$index])) {
+                                        $s_item = $data_siswa[$index];
+                                        $nama_siswa = $s_item['nama'] ?? $s_item['nama_siswa'] ?? $s_item['nama_lengkap'] ?? 'Siswa Tidak Ditemukan';
+                                    } else {
+                                        $nama_siswa = 'Siswa Tidak Ditemukan';
+                                    }
+                                }
+
+                                // Deteksi deskripsi pelanggaran
                                 $teks_pelanggaran = $row['pelanggaran'] ?? $row['nama_pelanggaran'] ?? $row['keterangan'] ?? $row['deskripsi'] ?? $row['jenis_pelanggaran'] ?? '-';
                                 
                                 // Poin dan Status
@@ -112,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
                                 }
                                 ?>
                                 <tr>
-                                    <td><?php echo $no++; ?></td>
+                                    <td><?php echo $index + 1; ?></td>
                                     <td><b><?php echo htmlspecialchars($nama_siswa); ?></b></td>
                                     <td><?php echo htmlspecialchars($teks_pelanggaran); ?></td>
                                     <td class="text-center"><span class="badge bg-danger"><?php echo htmlspecialchars($poin); ?></span></td>
@@ -157,6 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
                                 </div>
 
                                 <?php
+                                $index++;
                             }
                         } else {
                             echo "<tr><td colspan='6' class='text-center text-muted py-3'>Belum ada data tindakan yang perlu diproses.</td></tr>";
