@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include 'config/koneksi.php';
@@ -9,11 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$email = mysqli_real_escape_string(
-    $koneksi,
-    $_POST['email'] ?? ''
-);
-
+$email = mysqli_real_escape_string($koneksi, $_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
 
 if (empty($email) || empty($password)) {
@@ -24,6 +19,7 @@ if (empty($email) || empty($password)) {
     exit;
 }
 
+// Query untuk mencari data user
 $sql = "SELECT * FROM t_users WHERE email = '$email'";
 $hasil = mysqli_query($koneksi, $sql);
 
@@ -34,10 +30,12 @@ if (!$hasil) {
 if (mysqli_num_rows($hasil) > 0) {
     $data = mysqli_fetch_assoc($hasil);
 
-    // Verifikasi password sesuai format akun yang tersimpan
-    $password_benar = password_get_info($data['password'])['algo']
-        ? password_verify($password, $data['password'])
-        : ($password === $data['password']);
+    // Verifikasi password fleksibel (bisa teks biasa, md5, atau password_verify)
+    $password_benar = (
+        ($password === $data['password']) || 
+        (md5($password) === $data['password']) || 
+        (password_verify($password, $data['password']))
+    );
 
     if ($password_benar) {
         $role = strtolower(trim($data['role']));
@@ -63,7 +61,7 @@ if (mysqli_num_rows($hasil) > 0) {
             header("Location: dashboard.php");
             exit;
         } elseif ($role === 'guru') {
-            header("Location: dashboard_guru.php");
+            header("Location: dashboard_guru.php"); // Diarahkan ke dashboard_guru.php
             exit;
         }
     } else {

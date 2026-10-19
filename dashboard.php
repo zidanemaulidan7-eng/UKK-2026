@@ -69,7 +69,7 @@ $jumlah_wali_kelas = $data_wk['total'] ?? 0;
         <main class="col-md-9 col-lg-10 p-4">
             <h2>Dashboard</h2>
             <p>
-                Selamat datang, <strong><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : 'Administrator'; ?></strong> (Role: <?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'admin'; ?>)
+                Selamat datang, <strong>Zidan</strong> (Role: <?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'admin'; ?>)
             </p>
             <p>Anda berhasil login ke dalam sistem.</p>
             <hr>

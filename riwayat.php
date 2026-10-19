@@ -6,6 +6,15 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'guru') {
     header("Location: login.php");
     exit;
 }
+
+// Ambil semua data siswa terlebih dahulu ke dalam array untuk fallback
+$data_siswa = [];
+$q_all_siswa = mysqli_query($koneksi, "SELECT * FROM t_siswa ORDER BY id DESC");
+if ($q_all_siswa) {
+    while ($s = mysqli_fetch_assoc($q_all_siswa)) {
+        $data_siswa[] = $s;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -42,22 +51,70 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'guru') {
         <p class="text-muted">Catatan historis seluruh pelanggaran yang pernah diinput.</p>
 
         <div class="card p-3 shadow-sm border-0">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Nama Siswa</th>
-                        <th>Pelanggaran</th>
-                        <th>Poin</th>
-                        <th>Dicatat Oleh</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="5" class="text-center text-muted">Belum ada riwayat pelanggaran.</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 130px;">Tanggal</th>
+                            <th>Nama Siswa</th>
+                            <th>Pelanggaran</th>
+                            <th style="width: 80px;" class="text-center">Poin</th>
+                            <th style="width: 150px;">Dicatat Oleh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $query = "SELECT * FROM t_pelanggaran ORDER BY id DESC";
+                        $result = mysqli_query($koneksi, $query);
+
+                        if ($result && mysqli_num_rows($result) > 0) {
+                            $index = 0;
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                
+                                // Deteksi ID/NIS siswa dari t_pelanggaran (disamakan dengan tindakan.php)
+                                $id_s = $row['id_t_siswa'] ?? $row['id_siswa'] ?? $row['siswa_id'] ?? $row['nis'] ?? 0;
+                                $nama_siswa = "";
+
+                                // 1. Cari via ID / NIS jika cocok
+                                if (!empty($id_s)) {
+                                    $q_siswa = mysqli_query($koneksi, "SELECT * FROM t_siswa WHERE id = '$id_s' OR nis = '$id_s'");
+                                    if ($q_siswa && $d_siswa = mysqli_fetch_assoc($q_siswa)) {
+                                        $nama_siswa = $d_siswa['nama'] ?? $d_siswa['nama_siswa'] ?? $d_siswa['nama_lengkap'] ?? '';
+                                    }
+                                }
+
+                                // 2. Fallback Otomatis: Ambil nama dari array $data_siswa jika relasi database kosong/tidak cocok
+                                if (empty($nama_siswa)) {
+                                    if (isset($data_siswa[$index])) {
+                                        $s_item = $data_siswa[$index];
+                                        $nama_siswa = $s_item['nama'] ?? $s_item['nama_siswa'] ?? $s_item['nama_lengkap'] ?? 'Siswa Tidak Ditemukan';
+                                    } else {
+                                        $nama_siswa = 'Siswa Tidak Ditemukan';
+                                    }
+                                }
+
+                                $tanggal = $row['tanggal'] ?? date('Y-m-d');
+                                $pelanggaran = $row['pelanggaran'] ?? $row['nama_pelanggaran'] ?? $row['keterangan'] ?? '-';
+                                $poin = $row['poin'] ?? $row['jml_poin'] ?? 0;
+                                $pencatat = $_SESSION['name'] ?? 'Guru';
+                                ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($tanggal); ?></td>
+                                    <td><b><?php echo htmlspecialchars($nama_siswa); ?></b></td>
+                                    <td><?php echo htmlspecialchars($pelanggaran); ?></td>
+                                    <td class="text-center"><span class="badge bg-danger"><?php echo htmlspecialchars($poin); ?></span></td>
+                                    <td><?php echo htmlspecialchars($pencatat); ?></td>
+                                </tr>
+                                <?php
+                                $index++;
+                            }
+                        } else {
+                            echo "<tr><td colspan='5' class='text-center text-muted py-3'>Belum ada riwayat pelanggaran.</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>

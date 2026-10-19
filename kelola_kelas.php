@@ -3,9 +3,15 @@ session_start();
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
+// Pastikan hanya admin yang bisa mengakses
+if ($_SESSION['role'] !== 'admin') {
+    die("Akses ditolak!");
+}
+
+// Ambil semua data kelas (DIURUTKAN ASCENDING: 1, 2, 3...)
 $query = mysqli_query($koneksi, "
     SELECT * FROM t_kelas
-    ORDER BY id DESC
+    ORDER BY id ASC
 ");
 
 if (!$query) {
@@ -18,9 +24,13 @@ if (!$query) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <title>Kelola Kelas</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- DataTables Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 </head>
 <body>
 
@@ -29,32 +39,28 @@ if (!$query) {
         <!-- SIDEBAR -->
         <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
             <h4 class="text-white mb-4">
-                pelanggaran siswa
+                Pelanggaran Siswa
             </h4>
             <ul class="nav nav-pills flex-column">
                 <li class="nav-item mb-2">
-                    <a href="dashboard.php" class="nav-link text-white">
-                        Dashboard
-                    </a>
+                    <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a href="kelola_siswa.php" class="nav-link text-white">
-                        kelola Siswa
-                    </a>
+                    <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a href="kelola_guru.php" class="nav-link text-white">kelola Guru</a>
+                    <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a href="kelola_kelas.php" class="nav-link active">kelola Kelas</a>
+                    <a href="kelola_kelas.php" class="nav-link active">Kelola Kelas</a>
                 </li>
-                <!-- Menu Kelola Tahun Ajaran yang ditambahkan -->
                 <li class="nav-item mb-2">
                     <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
-                    <!-- Menu Kelola Wali Kelas ditambahkan di sini -->
+                </li>
                 <li class="nav-item mb-2">
                     <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
-                    <li class="nav-item mb-2">
+                </li>
+                <li class="nav-item mb-2">
                     <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
                 </li>
                 <li class="nav-item mb-2">
@@ -79,10 +85,21 @@ if (!$query) {
                 <a href="tambah_kelas.php" class="btn btn-primary btn-sm">+ Tambah Kelas</a>
             </div>
 
-            <hr>
+            <?php if (isset($_SESSION['pesan'])) { ?>
+                <div class="alert alert-success mt-3">
+                    <?php
+                    echo $_SESSION['pesan'];
+                    unset($_SESSION['pesan']);
+                    ?>
+                </div>
+            <?php } ?>
+
+            <hr class="my-4">
+
+            <h4 class="mb-3">Data Kelas</h4>
 
             <div class="table-responsive">
-                <table class="table table-bordered table-striped">
+                <table id="tabelKelas" class="table table-bordered table-striped align-middle" style="width:100%">
                     <thead class="table-dark">
                         <tr>
                             <th>No</th>
@@ -95,42 +112,73 @@ if (!$query) {
                     </thead>
                     <tbody>
                         <?php
-                        $no = 1;
-
-                        if (mysqli_num_rows($query) > 0) {
+                        if ($query && mysqli_num_rows($query) > 0) {
                             while ($kelas = mysqli_fetch_assoc($query)) {
                         ?>
                             <tr>
-                                <td><?= $no++ ?></td>
-                                <td><?= htmlspecialchars($kelas['nama']) ?></td>
-                                <td><?= htmlspecialchars($kelas['tingkat']) ?></td>
-                                <td><?= htmlspecialchars($kelas['jurusan']) ?></td>
+                                <td><?= htmlspecialchars($kelas['id']); ?></td>
+                                <td><?= htmlspecialchars($kelas['nama']); ?></td>
+                                <td><?= htmlspecialchars($kelas['tingkat']); ?></td>
+                                <td><?= htmlspecialchars($kelas['jurusan']); ?></td>
                                 <td>
-                                    <?= $kelas['status_aktif'] ? 'Aktif' : 'Tidak Aktif' ?>
+                                    <?php 
+                                    if (isset($kelas['status_aktif']) && $kelas['status_aktif'] == 1) {
+                                        echo '<span class="badge bg-success">Aktif</span>';
+                                    } else {
+                                        echo '<span class="badge bg-danger">Tidak Aktif</span>';
+                                    }
+                                    ?>
                                 </td>
                                 <td>
-                                    <a href="edit_kelas.php?id=<?= $kelas['id'] ?>" class="btn btn-warning btn-sm mb-1">Edit</a>
-                                    <a href="hapus_kelas.php?id=<?= $kelas['id'] ?>"
+                                    <a href="edit_kelas.php?id=<?= $kelas['id']; ?>" class="btn btn-warning btn-sm mb-1">Edit</a>
+                                    <a href="hapus_kelas.php?id=<?= $kelas['id']; ?>" 
                                        class="btn btn-danger btn-sm"
                                        onclick="return confirm('Yakin ingin menghapus kelas ini?')">
                                         Hapus
                                     </a>
                                 </td>
                             </tr>
-                        <?php
+                        <?php 
                             }
-                        } else {
+                        }
                         ?>
-                            <tr>
-                                <td colspan="6" class="text-center">Belum ada data kelas.</td>
-                            </tr>
-                        <?php } ?>
                     </tbody>
                 </table>
             </div>
         </main>
     </div>
 </div>
+
+<!-- JQUERY & BOOTSTRAP JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- DATATABLES JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- INISIALISASI DATATABLE -->
+<script>
+    $(document).ready(function() {
+        $('#tabelKelas').DataTable({
+            "pagingType": "simple_numbers",
+            "language": {
+                "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data kelas tidak ditemukan",
+                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "infoEmpty": "Tidak ada data yang tersedia",
+                "infoFiltered": "(difilter dari total _MAX_ data)",
+                "search": "Cari Kelas:",
+                "paginate": {
+                    "next": "Selanjutnya",
+                    "previous": "Sebelumnya"
+                }
+            },
+            "pageLength": 10,
+            "order": [[0, "asc"]]
+        });
+    });
+</script>
 
 </body>
 </html>
