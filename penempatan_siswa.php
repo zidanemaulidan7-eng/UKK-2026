@@ -85,6 +85,9 @@ if (!$query) {
                 <li class="nav-item mb-2">
                     <a href="penempatan_siswa.php" class="nav-link active">Penempatan Siswa</a>
                 </li>
+                <li class="nav-item mb-2">
+                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
+                </li>
                 <!-- Menu Cetak / Export di Sidebar -->
                 <li class="nav-item mb-2">
                     <a href="#" onclick="window.print()" class="nav-link text-white">Cetak / Export</a>

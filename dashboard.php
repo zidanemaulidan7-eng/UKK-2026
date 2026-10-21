@@ -45,12 +45,15 @@ $jumlah_wali_kelas = $data_wk['total'] ?? 0;
                 <li class="nav-item mb-2">
                     <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
                 </li>
-                <!-- Menu Kelola Wali Kelas ditambahkan di sini -->
                 <li class="nav-item mb-2">
                     <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
+                </li>
+                <!-- Menu Kelola Kategori Pelanggaran ditambahkan di bawah Kelola Wali Kelas -->
+                <li class="nav-item mb-2">
+                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
+                </li>
                 <li class="nav-item mb-2">
                     <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
-                </li>
                 </li>
                 <li class="nav-item mb-2">
                     <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
