@@ -115,6 +115,9 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM $nama_tabel ORDER BY id_kate
                     <a href="kelola_kategori_pelanggaran.php" class="nav-link active">Kelola Kategori Pelanggaran</a>
                 </li>
                 <li class="nav-item mb-2">
+                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
+                </li>
+                <li class="nav-item mb-2">
                     <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
                 </li>
                 <li class="nav-item mb-2">
