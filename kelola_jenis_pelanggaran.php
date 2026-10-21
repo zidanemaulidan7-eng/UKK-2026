@@ -3,110 +3,76 @@ session_start();
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-// Deteksi nama tabel jenis/kategori pelanggaran di database
+// Tentukan nama tabel
 $nama_tabel = 't_pelanggaran';
 $check_table = mysqli_query($koneksi, "SHOW TABLES LIKE '$nama_tabel'");
 if (!$check_table || mysqli_num_rows($check_table) == 0) {$nama_tabel = 'pelanggaran';
 }
 
-// Cek apakah tabel kosong. Jika kosong, isi otomatis data sampel sesuai laporan
-$check_empty = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM $nama_tabel");
-$data_count = mysqli_fetch_assoc($check_empty);
-
-if (($data_count['total'] ?? 0) == 0) {
-    // Ambil daftar kolom asli tabel untuk menyusun query insert dinamis
-    $col_query = mysqli_query($koneksi, "SHOW COLUMNS FROM $nama_tabel");
-    $fields = [];
-    if ($col_query) {
-        while ($col = mysqli_fetch_assoc($col_query)) {
-            if (strtolower($col['Extra']) === 'auto_increment') continue;
-            $fields[] =$col['Field'];
+// Cek Primary Key
+$pk_col = 'id';
+$col_query = mysqli_query($koneksi, "SHOW COLUMNS FROM `$nama_tabel`");
+if ($col_query) {
+    while ($col = mysqli_fetch_assoc($col_query)) {
+        if ($col['Key'] === 'PRI') {
+            $pk_col =$col['Field'];
+            break;
         }
     }
-
-    $sample_data = [
-        ['Kedisiplinan 1', 'PG-001', 'Terlambat datang ke sekolah #001', 2, 'Deskripsi pelanggaran nomor 1.'],
-        ['Kerapian 1', 'PG-002', 'Tidak memakai atribut lengkap #002', 3, 'Deskripsi pelanggaran nomor 2.'],
-        ['Kehadiran 1', 'PG-003', 'Tidak memakai seragam sesuai ketentuan #003', 4, 'Deskripsi pelanggaran nomor 3.'],
-        ['Ketertiban 1', 'PG-004', 'Meninggalkan kelas tanpa izin #004', 5, 'Deskripsi pelanggaran nomor 4.'],
-        ['Perlengkapan 1', 'PG-005', 'Tidak mengerjakan tugas #005', 6, 'Deskripsi pelanggaran nomor 5.'],
-        ['Sikap 1', 'PG-006', 'Rambut tidak sesuai aturan #006', 7, 'Deskripsi pelanggaran nomor 6.'],
-        ['Kebersihan 1', 'PG-007', 'Membawa barang terlarang #007', 8, 'Deskripsi pelanggaran nomor 7.'],
-        ['Keamanan 1', 'PG-008', 'Berkata tidak sopan #008', 9, 'Deskripsi pelanggaran nomor 8.'],
-        ['Akademik 1', 'PG-009', 'Membuang sampah sembarangan #009', 10, 'Deskripsi pelanggaran nomor 9.']
-    ];
-
-    foreach ($sample_data as $row) {$cols = implode("`, `", array_slice($fields, 0, count($row)));
-        $vals = "'" . implode("', '", array_map(function($v) use ($koneksi) { return mysqli_real_escape_string($koneksi, $v); },$row)) . "'";
-        mysqli_query($koneksi, "INSERT INTO `$nama_tabel` (`$cols`) VALUES ($vals)");
-    }
 }
 
-// Proses Tambah Data
+// PROSES TAMBAH DATA
 if (isset($_POST['tambah'])) {
-    $kategori = mysqli_real_escape_string($koneksi, $_POST['kategori']);$kode = mysqli_real_escape_string($koneksi,$_POST['kode']);
-    $nama_pelanggaran = mysqli_real_escape_string($koneksi, $_POST['nama_pelanggaran']);$poin = (int)$_POST['poin'];$deskripsi = mysqli_real_escape_string($koneksi,$_POST['deskripsi']);
+    $kategori   = mysqli_real_escape_string($koneksi, $_POST['kategori']);$kode       = mysqli_real_escape_string($koneksi,$_POST['kode']);
+    $nama_pel   = mysqli_real_escape_string($koneksi, $_POST['nama_pelanggaran']);$poin       = (int)$_POST['poin'];$deskripsi  = mysqli_real_escape_string($koneksi,$_POST['deskripsi']);
 
-    $query = "INSERT INTO $nama_tabel (kategori, kode, nama_pelanggaran, poin, deskripsi) 
-              VALUES ('$kategori', '$kode', '$nama_pelanggaran', '$poin', '$deskripsi')";
-    if (mysqli_query($koneksi, $query)) {$_SESSION['pesan'] = 'Jenis pelanggaran berhasil ditambahkan!';
-        header("Location: kelola_jenis_pelanggaran.php");
-        exit();
+    $query = "INSERT INTO `$nama_tabel` (`kategori`, `kode`, `nama_pelanggaran`, `poin`, `deskripsi`) 
+              VALUES ('$kategori', '$kode', '$nama_pel', '$poin', '$deskripsi')";
+
+    if (mysqli_query($koneksi, $query)) {$_SESSION['pesan'] = 'Jenis pelanggaran berhasil disimpan!';
     } else {
-        $error_msg = addslashes(mysqli_error($koneksi));
-        echo "<script>alert('Gagal menambah data: $error_msg');</script>";
+        $_SESSION['pesan_error'] = 'Gagal menyimpan: ' . mysqli_error($koneksi);
     }
+    header("Location: kelola_jenis_pelanggaran.php");
+    exit();
 }
 
-// Proses Edit Data
-if (isset($_POST['edit'])) {$id = mysqli_real_escape_string($koneksi,$_POST['id']);
-    $kategori = mysqli_real_escape_string($koneksi, $_POST['kategori']);$kode = mysqli_real_escape_string($koneksi,$_POST['kode']);
-    $nama_pelanggaran = mysqli_real_escape_string($koneksi, $_POST['nama_pelanggaran']);$poin = (int)$_POST['poin'];$deskripsi = mysqli_real_escape_string($koneksi,$_POST['deskripsi']);
+// PROSES EDIT DATA
+if (isset($_POST['edit'])) {$id         = mysqli_real_escape_string($koneksi,$_POST['id']);
+    $kategori   = mysqli_real_escape_string($koneksi, $_POST['kategori']);$kode       = mysqli_real_escape_string($koneksi,$_POST['kode']);
+    $nama_pel   = mysqli_real_escape_string($koneksi, $_POST['nama_pelanggaran']);$poin       = (int)$_POST['poin'];$deskripsi  = mysqli_real_escape_string($koneksi,$_POST['deskripsi']);
 
-    // Cek primary key yang digunakan (id_pelanggaran atau id)
-    $pk = 'id_pelanggaran';
-    $col_check = mysqli_query($koneksi, "SHOW COLUMNS FROM $nama_tabel LIKE 'id_pelanggaran'");
-    if (!$col_check || mysqli_num_rows($col_check) == 0) {$pk = 'id';
-    }
+    $query = "UPDATE `$nama_tabel` SET 
+                `kategori` = '$kategori',
+                `kode` = '$kode',
+                `nama_pelanggaran` = '$nama_pel',
+                `poin` = '$poin',
+                `deskripsi` = '$deskripsi'
+              WHERE `$pk_col` = '$id'";
 
-    $query = "UPDATE $nama_tabel SET 
-                kategori='$kategori', 
-                kode='$kode', 
-                nama_pelanggaran='$nama_pelanggaran', 
-                poin='$poin', 
-                deskripsi='$deskripsi' 
-              WHERE $pk='$id'";
-              
     if (mysqli_query($koneksi, $query)) {$_SESSION['pesan'] = 'Jenis pelanggaran berhasil diperbarui!';
-        header("Location: kelola_jenis_pelanggaran.php");
-        exit();
     } else {
-        $error_msg = addslashes(mysqli_error($koneksi));
-        echo "<script>alert('Gagal memperbarui data: $error_msg');</script>";
+        $_SESSION['pesan_error'] = 'Gagal memperbarui: ' . mysqli_error($koneksi);
     }
+    header("Location: kelola_jenis_pelanggaran.php");
+    exit();
 }
 
-// Proses Hapus Data
+// PROSES HAPUS DATA
 if (isset($_GET['hapus'])) {
-    $id = mysqli_real_escape_string($koneksi, $_GET['hapus']);$pk = 'id_pelanggaran';
-    $col_check = mysqli_query($koneksi, "SHOW COLUMNS FROM $nama_tabel LIKE 'id_pelanggaran'");
-    if (!$col_check || mysqli_num_rows($col_check) == 0) {$pk = 'id';
-    }
+    $id = mysqli_real_escape_string($koneksi, $_GET['hapus']);$query = "DELETE FROM `$nama_tabel` WHERE `$pk_col` = '$id'";
 
-    $query = "DELETE FROM $nama_tabel WHERE $pk='$id'";
     if (mysqli_query($koneksi, $query)) {$_SESSION['pesan'] = 'Jenis pelanggaran berhasil dihapus!';
-        header("Location: kelola_jenis_pelanggaran.php");
-        exit();
     } else {
-        $error_msg = addslashes(mysqli_error($koneksi));
-        echo "<script>alert('Gagal menghapus data: $error_msg');</script>";
+        $_SESSION['pesan_error'] = 'Gagal menghapus: ' . mysqli_error($koneksi);
     }
+    header("Location: kelola_jenis_pelanggaran.php");
+    exit();
 }
 
-// Ambil Seluruh Data
-$query_data = mysqli_query($koneksi, "SELECT * FROM $nama_tabel");
+// AMBIL DATA PELANGGARAN
+$query_data = mysqli_query($koneksi, "SELECT * FROM `$nama_tabel` ORDER BY `$pk_col` ASC");
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -116,7 +82,6 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM $nama_tabel");
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <!-- DataTables Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 </head>
@@ -128,43 +93,19 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM $nama_tabel");
         <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
             <h4 class="text-white mb-4">Pelanggaran Siswa</h4>
             <ul class="nav nav-pills flex-column">
-                <li class="nav-item mb-2">
-                    <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
-                </li>
+                <li class="nav-item mb-2"><a href="dashboard.php" class="nav-link text-white">Dashboard</a></li>
+                <li class="nav-item mb-2"><a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a></li>
+                <li class="nav-item mb-2"><a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a></li>
+                <li class="nav-item mb-2"><a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a></li>
+                <li class="nav-item mb-2"><a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a></li>
+                <li class="nav-item mb-2"><a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a></li>
+                <li class="nav-item mb-2"><a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a></li>
+                <li class="nav-item mb-2"><a href="kelola_jenis_pelanggaran.php" class="nav-link active">Kelola Jenis Pelanggaran</a></li>
+                <li class="nav-item mb-2"><a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a></li>
+                <li class="nav-item mb-2"><a href="pelanggaran.php" class="nav-link text-white">Laporan</a></li>
+                <li class="nav-item mb-2"><a href="tentang_saya.php" class="nav-link text-white">About Me</a></li>
                 <hr class="text-secondary">
-                <li class="nav-item mb-2">
-                    <a href="logout.php" class="nav-link text-danger">Logout</a>
-                </li>
+                <li class="nav-item mb-2"><a href="logout.php" class="nav-link text-danger">Logout</a></li>
             </ul>
         </div>
 
@@ -177,12 +118,17 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM $nama_tabel");
                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambah">+ Tambah Pelanggaran</button>
             </div>
 
+            <!-- PESAN NOTIFIKASI -->
             <?php if (isset($_SESSION['pesan'])) { ?>
-                <div class="alert alert-success mt-3">
-                    <?php
-                    echo $_SESSION['pesan'];
-                    unset($_SESSION['pesan']);
-                    ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <?= $_SESSION['pesan']; unset($_SESSION['pesan']); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php } ?>
+            <?php if (isset($_SESSION['pesan_error'])) { ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= $_SESSION['pesan_error']; unset($_SESSION['pesan_error']); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php } ?>
 
@@ -208,12 +154,11 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM $nama_tabel");
                         <?php 
                         $no = 1;
                         if ($query_data && mysqli_num_rows($query_data) > 0) :
-                            while ($row = mysqli_fetch_assoc($query_data)) : 
-                                $id_row =$row['id_pelanggaran'] ?? $row['id'] ?? $no;
-                                $kat = $row['kategori'] ?? $row['nama_kategori'] ?? 'Umum';
-                                $kd  =$row['kode'] ?? 'PG-' . sprintf("%03d", $no);$nm  = $row['nama_pelanggaran'] ?? $row['nama'] ?? '-';
-                                $pn  =$row['poin'] ?? 0;
-                                $desk=$row['deskripsi'] ?? '-';
+                            while ($row = mysqli_fetch_assoc($query_data)) :$id_row  = $row[$pk_col];
+                                $kat     =$row['kategori'] ?? 'Umum';
+                                $kd      =$row['kode'] ?? ('PG-' . sprintf("%03d", $no));$nm      = $row['nama_pelanggaran'] ?? $row['nama'] ?? '-';
+                                $pn      =$row['poin'] ?? 0;
+                                $desk    =$row['deskripsi'] ?? '-';
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
@@ -222,9 +167,7 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM $nama_tabel");
                             <td><?= htmlspecialchars($nm); ?></td>
                             <td><?= htmlspecialchars($pn); ?></td>
                             <td><?= htmlspecialchars($desk); ?></td>
-                            <td>
-                                <span class="badge bg-success">Aktif</span>
-                            </td>
+                            <td><span class="badge bg-success">Aktif</span></td>
                             <td>
                                 <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $id_row; ?>">Edit</button>
                                 <a href="kelola_jenis_pelanggaran.php?hapus=<?= $id_row; ?>" 
@@ -269,7 +212,7 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM $nama_tabel");
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                            <button type="submit" name="edit" class="btn btn-primary">Simpan</button>
+                                            <button type="submit" name="edit" class="btn btn-primary">Simpan Perubahan</button>
                                         </div>
                                     </form>
                                 </div>
@@ -330,29 +273,21 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM $nama_tabel");
 <!-- JQUERY & BOOTSTRAP JS -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <!-- DATATABLES JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-<!-- INISIALISASI DATATABLE -->
 <script>
     $(document).ready(function() {$('#tabelPelanggaran').DataTable({
-            "pagingType": "simple_numbers",
             "language": {
                 "lengthMenu": "Tampilkan _MENU_ data per halaman",
                 "zeroRecords": "Data pelanggaran tidak ditemukan",
                 "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
-                "infoEmpty": "Tidak ada data yang tersedia",
-                "infoFiltered": "(difilter dari total _MAX_ data)",
+                "infoEmpty": "Tidak ada data",
                 "search": "Cari Pelanggaran:",
-                "paginate": {
-                    "next": "Selanjutnya",
-                    "previous": "Sebelumnya"
-                }
+                "paginate": { "next": "Selanjutnya", "previous": "Sebelumnya" }
             },
-            "pageLength": 10,
-            "order": [[0, "asc"]]
+            "pageLength": 10
         });
     });
 </script>
