@@ -88,12 +88,12 @@ if (!$query) {
                 <li class="nav-item mb-2">
                     <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
-                </li>
                 <!-- Menu Cetak / Export di Sidebar -->
                 <li class="nav-item mb-2">
                     <a href="#" onclick="window.print()" class="nav-link text-white">Cetak / Export</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
                 </li>
                 <li class="nav-item mb-2">
                     <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>

@@ -63,9 +63,9 @@ include 'config/koneksi.php';
             <a href="kelola_tahun_ajaran.php">Kelola Tahun Ajaran</a>
             <a href="kelola_wali_kelas.php">Kelola Wali Kelas</a>
             <a href="kelola_kategori_pelanggaran.php">Kelola Kategori Pelanggaran</a>
-            <a href="kelola_jenis_pelanggaran.php">Kelola Jenis Pelanggaran</a>
             <a href="penempatan_siswa.php">Penempatan Siswa</a>
-            <a href="laporan.php">Laporan</a>
+            <a href="kelola_jenis_pelanggaran.php">Kelola Jenis Pelanggaran</a>
+            <a href="pelanggaran.php">Laporan</a>
             <a href="tentang_saya.php" class="active">About Me</a>
             <a href="logout.php" class="text-danger mt-4">Logout</a>
         </nav>
