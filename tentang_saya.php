@@ -98,6 +98,11 @@ include 'config/koneksi.php';
                                 <td class="fw-semibold">Zidan</td>
                             </tr>
                             <tr>
+                                <th style="width: 35%;" class="text-secondary">Nama Panggilan</th>
+                                <td style="width: 5%;">:</td>
+                                <td class="fw-semibold">Zee</td>
+                            </tr>
+                            <tr>
                                 <th class="text-secondary">Umur</th>
                                 <td>:</td>
                                 <td>19 Tahun</td>
