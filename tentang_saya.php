@@ -120,6 +120,10 @@ include 'config/koneksi.php';
                             <tr>
                                 <th class="text-secondary">Kota</th>
                                 <td>:</td>
+                                <td>Jepang</td>
+                            <tr>
+                                <th class="text-secondary">Kota asal</th>
+                                <td>:</td>
                                 <td>Tasikmalaya</td>
                             </tr>
                         </tbody>
