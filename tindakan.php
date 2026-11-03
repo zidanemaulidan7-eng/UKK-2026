@@ -7,6 +7,13 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'guru') {
     exit;
 }
 
+// Cek apakah kolom status_tindakan sudah ada di tabel t_pelanggaran
+$col_query = mysqli_query($koneksi, "SHOW COLUMNS FROM `t_pelanggaran` LIKE 'status_tindakan'");
+if ($col_query && mysqli_num_rows($col_query) == 0) {
+    // Jika belum ada, buat kolomnya secara otomatis agar tidak error
+    mysqli_query($koneksi, "ALTER TABLE `t_pelanggaran` ADD COLUMN `status_tindakan` VARCHAR(100) NOT NULL DEFAULT 'Perlu Tindakan'");
+}
+
 // Proses Update Status Tindakan jika form modal disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $id_pelanggaran = intval($_POST['id_pelanggaran']);
@@ -40,10 +47,13 @@ if ($q_all_siswa) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Tindakan & Sanksi - Guru</title>
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
         body { min-height: 100vh; background-color: #f8f9fa; }
-        .sidebar { width: 250px; min-height: 100vh; background-color: #343a40; color: #fff; position: fixed; }
+        .sidebar { width: 250px; min-height: 100vh; background-color: #343a40; color: #fff; position: fixed; z-index: 100; }
         .sidebar .brand { padding: 1.5rem 1rem; font-size: 1.25rem; font-weight: bold; border-bottom: 1px solid #4f5962; }
         .sidebar a { color: #c2c7d0; text-decoration: none; padding: 12px 20px; display: block; }
         .sidebar a:hover, .sidebar a.active { background-color: #0d6efd; color: #fff; }
@@ -73,7 +83,8 @@ if ($q_all_siswa) {
 
         <div class="card p-4 shadow-sm border-0">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped align-middle mb-0">
+                <!-- Tambahkan ID tabelTindakan untuk DataTables -->
+                <table id="tabelTindakan" class="table table-bordered table-striped align-middle mb-0" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th style="width: 50px;">#</th>
@@ -188,7 +199,27 @@ if ($q_all_siswa) {
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle untuk Modal -->
+    <!-- jQuery & Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#tabelTindakan').DataTable({
+                "language": {
+                    "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                    "zeroRecords": "Data tindakan tidak ditemukan",
+                    "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                    "infoEmpty": "Tidak ada data",
+                    "search": "Cari Tindakan:",
+                    "paginate": { "next": "Selanjutnya", "previous": "Sebelumnya" }
+                },
+                "pageLength": 10
+            });
+        });
+    </script>
 </body>
 </html>

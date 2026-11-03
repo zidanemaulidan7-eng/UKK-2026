@@ -22,10 +22,13 @@ if ($q_all_siswa) {
 <head>
     <meta charset="UTF-8">
     <title>Riwayat Pelanggaran - Guru</title>
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
         body { min-height: 100vh; background-color: #f8f9fa; }
-        .sidebar { width: 250px; min-height: 100vh; background-color: #343a40; color: #fff; position: fixed; }
+        .sidebar { width: 250px; min-height: 100vh; background-color: #343a40; color: #fff; position: fixed; z-index: 100; }
         .sidebar .brand { padding: 1.5rem 1rem; font-size: 1.25rem; font-weight: bold; border-bottom: 1px solid #4f5962; }
         .sidebar a { color: #c2c7d0; text-decoration: none; padding: 12px 20px; display: block; }
         .sidebar a:hover, .sidebar a.active { background-color: #0d6efd; color: #fff; }
@@ -52,7 +55,8 @@ if ($q_all_siswa) {
 
         <div class="card p-3 shadow-sm border-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <!-- Ditambahkan id="tabelRiwayat" untuk mengaktifkan DataTables -->
+                <table id="tabelRiwayat" class="table table-hover align-middle mb-0" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th style="width: 130px;">Tanggal</th>
@@ -117,5 +121,28 @@ if ($q_all_siswa) {
             </div>
         </div>
     </div>
+
+    <!-- jQuery & Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#tabelRiwayat').DataTable({
+                "language": {
+                    "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                    "zeroRecords": "Data riwayat tidak ditemukan",
+                    "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                    "infoEmpty": "Tidak ada data",
+                    "search": "Cari Riwayat:",
+                    "paginate": { "next": "Selanjutnya", "previous": "Sebelumnya" }
+                },
+                "pageLength": 10
+            });
+        });
+    </script>
 </body>
 </html>
