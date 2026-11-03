@@ -6,30 +6,64 @@ include 'config/koneksi.php';
 // Tentukan nama tabel
 $nama_tabel = 't_pelanggaran';
 $check_table = mysqli_query($koneksi, "SHOW TABLES LIKE '$nama_tabel'");
-if (!$check_table || mysqli_num_rows($check_table) == 0) {$nama_tabel = 'pelanggaran';
+if (!$check_table || mysqli_num_rows($check_table) == 0) {
+    $nama_tabel = 'pelanggaran';
 }
 
-// Cek Primary Key
+// Cek Primary Key & Daftar Kolom yang ada di Database secara otomatis
 $pk_col = 'id';
+$columns = [];
 $col_query = mysqli_query($koneksi, "SHOW COLUMNS FROM `$nama_tabel`");
 if ($col_query) {
     while ($col = mysqli_fetch_assoc($col_query)) {
+        $columns[] = $col['Field'];
         if ($col['Key'] === 'PRI') {
-            $pk_col =$col['Field'];
-            break;
+            $pk_col = $col['Field'];
         }
     }
 }
 
+// Deteksi nama kolom secara fleksibel agar tidak error
+$has_kategori = in_array('kategori', $columns);
+$has_kode     = in_array('kode', $columns);
+$col_nama     = in_array('nama_pelanggaran', $columns) ? 'nama_pelanggaran' : (in_array('nama', $columns) ? 'nama' : 'nama_pelanggaran');
+$has_poin     = in_array('poin', $columns);
+$has_desk     = in_array('deskripsi', $columns);
+
 // PROSES TAMBAH DATA
 if (isset($_POST['tambah'])) {
-    $kategori   = mysqli_real_escape_string($koneksi, $_POST['kategori']);$kode       = mysqli_real_escape_string($koneksi,$_POST['kode']);
-    $nama_pel   = mysqli_real_escape_string($koneksi, $_POST['nama_pelanggaran']);$poin       = (int)$_POST['poin'];$deskripsi  = mysqli_real_escape_string($koneksi,$_POST['deskripsi']);
+    $kode      = $has_kode ? mysqli_real_escape_string($koneksi, $_POST['kode']) : '';
+    $nama_pel  = mysqli_real_escape_string($koneksi, $_POST['nama_pelanggaran']);
+    $poin      = $has_poin ? (int)$_POST['poin'] : 0;
+    $deskripsi = $has_desk ? mysqli_real_escape_string($koneksi, $_POST['deskripsi']) : '';
 
-    $query = "INSERT INTO `$nama_tabel` (`kategori`, `kode`, `nama_pelanggaran`, `poin`, `deskripsi`) 
-              VALUES ('$kategori', '$kode', '$nama_pel', '$poin', '$deskripsi')";
+    $fields = [];
+    $values = [];
 
-    if (mysqli_query($koneksi, $query)) {$_SESSION['pesan'] = 'Jenis pelanggaran berhasil disimpan!';
+    if ($has_kategori && isset($_POST['kategori'])) {
+        $fields[] = '`kategori`';
+        $values[] = "'" . mysqli_real_escape_string($koneksi, $_POST['kategori']) . "'";
+    }
+    if ($has_kode) {
+        $fields[] = '`kode`';
+        $values[] = "'$kode'";
+    }
+    $fields[] = "`$col_nama`";
+    $values[] = "'$nama_pel'";
+    
+    if ($has_poin) {
+        $fields[] = '`poin`';
+        $values[] = "'$poin'";
+    }
+    if ($has_desk) {
+        $fields[] = '`deskripsi`';
+        $values[] = "'$deskripsi'";
+    }
+
+    $query = "INSERT INTO `$nama_tabel` (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $values) . ")";
+
+    if (mysqli_query($koneksi, $query)) {
+        $_SESSION['pesan'] = 'Jenis pelanggaran berhasil disimpan!';
     } else {
         $_SESSION['pesan_error'] = 'Gagal menyimpan: ' . mysqli_error($koneksi);
     }
@@ -38,19 +72,33 @@ if (isset($_POST['tambah'])) {
 }
 
 // PROSES EDIT DATA
-if (isset($_POST['edit'])) {$id         = mysqli_real_escape_string($koneksi,$_POST['id']);
-    $kategori   = mysqli_real_escape_string($koneksi, $_POST['kategori']);$kode       = mysqli_real_escape_string($koneksi,$_POST['kode']);
-    $nama_pel   = mysqli_real_escape_string($koneksi, $_POST['nama_pelanggaran']);$poin       = (int)$_POST['poin'];$deskripsi  = mysqli_real_escape_string($koneksi,$_POST['deskripsi']);
+if (isset($_POST['edit'])) {
+    $id        = mysqli_real_escape_string($koneksi, $_POST['id']);
+    $kode      = $has_kode ? mysqli_real_escape_string($koneksi, $_POST['kode']) : '';
+    $nama_pel  = mysqli_real_escape_string($koneksi, $_POST['nama_pelanggaran']);
+    $poin      = $has_poin ? (int)$_POST['poin'] : 0;
+    $deskripsi = $has_desk ? mysqli_real_escape_string($koneksi, $_POST['deskripsi']) : '';
 
-    $query = "UPDATE `$nama_tabel` SET 
-                `kategori` = '$kategori',
-                `kode` = '$kode',
-                `nama_pelanggaran` = '$nama_pel',
-                `poin` = '$poin',
-                `deskripsi` = '$deskripsi'
-              WHERE `$pk_col` = '$id'";
+    $updates = [];
+    if ($has_kategori && isset($_POST['kategori'])) {
+        $kategori = mysqli_real_escape_string($koneksi, $_POST['kategori']);
+        $updates[] = "`kategori` = '$kategori'";
+    }
+    if ($has_kode) {
+        $updates[] = "`kode` = '$kode'";
+    }
+    $updates[] = "`$col_nama` = '$nama_pel'";
+    if ($has_poin) {
+        $updates[] = "`poin` = '$poin'";
+    }
+    if ($has_desk) {
+        $updates[] = "`deskripsi` = '$deskripsi'";
+    }
 
-    if (mysqli_query($koneksi, $query)) {$_SESSION['pesan'] = 'Jenis pelanggaran berhasil diperbarui!';
+    $query = "UPDATE `$nama_tabel` SET " . implode(', ', $updates) . " WHERE `$pk_col` = '$id'";
+
+    if (mysqli_query($koneksi, $query)) {
+        $_SESSION['pesan'] = 'Jenis pelanggaran berhasil diperbarui!';
     } else {
         $_SESSION['pesan_error'] = 'Gagal memperbarui: ' . mysqli_error($koneksi);
     }
@@ -60,9 +108,11 @@ if (isset($_POST['edit'])) {$id         = mysqli_real_escape_string($koneksi,$_P
 
 // PROSES HAPUS DATA
 if (isset($_GET['hapus'])) {
-    $id = mysqli_real_escape_string($koneksi, $_GET['hapus']);$query = "DELETE FROM `$nama_tabel` WHERE `$pk_col` = '$id'";
+    $id = mysqli_real_escape_string($koneksi, $_GET['hapus']);
+    $query = "DELETE FROM `$nama_tabel` WHERE `$pk_col` = '$id'";
 
-    if (mysqli_query($koneksi, $query)) {$_SESSION['pesan'] = 'Jenis pelanggaran berhasil dihapus!';
+    if (mysqli_query($koneksi, $query)) {
+        $_SESSION['pesan'] = 'Jenis pelanggaran berhasil dihapus!';
     } else {
         $_SESSION['pesan_error'] = 'Gagal menghapus: ' . mysqli_error($koneksi);
     }
@@ -79,7 +129,6 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM `$nama_tabel` ORDER BY `$pk_
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Jenis Pelanggaran</title>
-    
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- DataTables Bootstrap 5 CSS -->
@@ -141,11 +190,11 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM `$nama_tabel` ORDER BY `$pk_
                     <thead class="table-dark">
                         <tr>
                             <th width="40">No</th>
-                            <th>Kategori</th>
-                            <th>Kode</th>
+                            <?php if ($has_kategori): ?><th>Kategori</th><?php endif; ?>
+                            <?php if ($has_kode): ?><th>Kode</th><?php endif; ?>
                             <th>Nama Pelanggaran</th>
-                            <th width="60">Poin</th>
-                            <th>Deskripsi</th>
+                            <?php if ($has_poin): ?><th width="60">Poin</th><?php endif; ?>
+                            <?php if ($has_desk): ?><th>Deskripsi</th><?php endif; ?>
                             <th width="80">Status</th>
                             <th width="120">Aksi</th>
                         </tr>
@@ -154,19 +203,21 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM `$nama_tabel` ORDER BY `$pk_
                         <?php 
                         $no = 1;
                         if ($query_data && mysqli_num_rows($query_data) > 0) :
-                            while ($row = mysqli_fetch_assoc($query_data)) :$id_row  = $row[$pk_col];
-                                $kat     =$row['kategori'] ?? 'Umum';
-                                $kd      =$row['kode'] ?? ('PG-' . sprintf("%03d", $no));$nm      = $row['nama_pelanggaran'] ?? $row['nama'] ?? '-';
-                                $pn      =$row['poin'] ?? 0;
-                                $desk    =$row['deskripsi'] ?? '-';
+                            while ($row = mysqli_fetch_assoc($query_data)) :
+                                $id_row = $row[$pk_col];
+                                $kat    = $has_kategori ? ($row['kategori'] ?? 'Umum') : '';
+                                $kd     = $has_kode ? ($row['kode'] ?? ('PG-' . sprintf("%03d", $no))) : '';
+                                $nm     = $row[$col_nama] ?? '-';
+                                $pn     = $has_poin ? ($row['poin'] ?? 0) : 0;
+                                $desk   = $has_desk ? ($row['deskripsi'] ?? '-') : '';
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= htmlspecialchars($kat); ?></td>
-                            <td><?= htmlspecialchars($kd); ?></td>
+                            <?php if ($has_kategori): ?><td><?= htmlspecialchars($kat); ?></td><?php endif; ?>
+                            <?php if ($has_kode): ?><td><?= htmlspecialchars($kd); ?></td><?php endif; ?>
                             <td><?= htmlspecialchars($nm); ?></td>
-                            <td><?= htmlspecialchars($pn); ?></td>
-                            <td><?= htmlspecialchars($desk); ?></td>
+                            <?php if ($has_poin): ?><td><?= htmlspecialchars($pn); ?></td><?php endif; ?>
+                            <?php if ($has_desk): ?><td><?= htmlspecialchars($desk); ?></td><?php endif; ?>
                             <td><span class="badge bg-success">Aktif</span></td>
                             <td>
                                 <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $id_row; ?>">Edit</button>
@@ -189,26 +240,34 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM `$nama_tabel` ORDER BY `$pk_
                                         </div>
                                         <div class="modal-body">
                                             <input type="hidden" name="id" value="<?= $id_row; ?>">
+                                            <?php if ($has_kategori): ?>
                                             <div class="mb-3">
                                                 <label class="form-label">Kategori</label>
                                                 <input type="text" class="form-control" name="kategori" value="<?= htmlspecialchars($kat); ?>" required>
                                             </div>
+                                            <?php endif; ?>
+                                            <?php if ($has_kode): ?>
                                             <div class="mb-3">
                                                 <label class="form-label">Kode Pelanggaran</label>
                                                 <input type="text" class="form-control" name="kode" value="<?= htmlspecialchars($kd); ?>" required>
                                             </div>
+                                            <?php endif; ?>
                                             <div class="mb-3">
                                                 <label class="form-label">Nama Pelanggaran</label>
                                                 <input type="text" class="form-control" name="nama_pelanggaran" value="<?= htmlspecialchars($nm); ?>" required>
                                             </div>
+                                            <?php if ($has_poin): ?>
                                             <div class="mb-3">
                                                 <label class="form-label">Poin</label>
                                                 <input type="number" class="form-control" name="poin" value="<?= htmlspecialchars($pn); ?>" required>
                                             </div>
+                                            <?php endif; ?>
+                                            <?php if ($has_desk): ?>
                                             <div class="mb-3">
                                                 <label class="form-label">Deskripsi</label>
                                                 <textarea class="form-control" name="deskripsi" rows="3"><?= htmlspecialchars($desk); ?></textarea>
                                             </div>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -240,26 +299,34 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM `$nama_tabel` ORDER BY `$pk_
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <?php if ($has_kategori): ?>
                     <div class="mb-3">
                         <label class="form-label">Kategori</label>
                         <input type="text" class="form-control" name="kategori" required placeholder="Contoh: Kedisiplinan 1">
                     </div>
+                    <?php endif; ?>
+                    <?php if ($has_kode): ?>
                     <div class="mb-3">
                         <label class="form-label">Kode Pelanggaran</label>
                         <input type="text" class="form-control" name="kode" required placeholder="Contoh: PG-010">
                     </div>
+                    <?php endif; ?>
                     <div class="mb-3">
                         <label class="form-label">Nama Pelanggaran</label>
                         <input type="text" class="form-control" name="nama_pelanggaran" required placeholder="Nama jenis pelanggaran">
                     </div>
+                    <?php if ($has_poin): ?>
                     <div class="mb-3">
                         <label class="form-label">Poin</label>
                         <input type="number" class="form-control" name="poin" required placeholder="Contoh: 5">
                     </div>
+                    <?php endif; ?>
+                    <?php if ($has_desk): ?>
                     <div class="mb-3">
                         <label class="form-label">Deskripsi</label>
                         <textarea class="form-control" name="deskripsi" rows="3" placeholder="Keterangan singkat pelanggaran"></textarea>
                     </div>
+                    <?php endif; ?>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -278,7 +345,8 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM `$nama_tabel` ORDER BY `$pk_
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-    $(document).ready(function() {$('#tabelPelanggaran').DataTable({
+    $(document).ready(function() {
+        $('#tabelPelanggaran').DataTable({
             "language": {
                 "lengthMenu": "Tampilkan _MENU_ data per halaman",
                 "zeroRecords": "Data pelanggaran tidak ditemukan",
