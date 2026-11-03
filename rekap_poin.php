@@ -74,14 +74,14 @@ if ($q_all_siswa) {
                                 // Deteksi ID/NIS siswa dari t_pelanggaran (disamakan dengan file lain)
                                 $id_s = $row['id_t_siswa'] ?? $row['id_siswa'] ?? $row['siswa_id'] ?? $row['nis'] ?? 0;
                                 $nama_siswa = "";
-                                $kelas_siswa = "-";
+                                $kelas_siswa = "";
 
                                 // 1. Cari via ID / NIS jika cocok
                                 if (!empty($id_s)) {
                                     $q_siswa = mysqli_query($koneksi, "SELECT * FROM t_siswa WHERE id = '$id_s' OR nis = '$id_s'");
                                     if ($q_siswa && $d_siswa = mysqli_fetch_assoc($q_siswa)) {
                                         $nama_siswa = $d_siswa['nama'] ?? $d_siswa['nama_siswa'] ?? $d_siswa['nama_lengkap'] ?? '';
-                                        $kelas_siswa = $d_siswa['kelas'] ?? $d_siswa['nama_kelas'] ?? $d_siswa['rombel'] ?? '-';
+                                        $kelas_siswa = $d_siswa['kelas'] ?? $d_siswa['nama_kelas'] ?? $d_siswa['rombel'] ?? '';
                                     }
                                 }
 
@@ -90,10 +90,17 @@ if ($q_all_siswa) {
                                     if (isset($data_siswa[$index])) {
                                         $s_item = $data_siswa[$index];
                                         $nama_siswa = $s_item['nama'] ?? $s_item['nama_siswa'] ?? $s_item['nama_lengkap'] ?? 'Siswa Tidak Ditemukan';
-                                        $kelas_siswa = $s_item['kelas'] ?? $s_item['nama_kelas'] ?? '-';
+                                        if (empty($kelas_siswa)) {
+                                            $kelas_siswa = $s_item['kelas'] ?? $s_item['nama_kelas'] ?? '';
+                                        }
                                     } else {
                                         $nama_siswa = 'Siswa Tidak Ditemukan';
                                     }
+                                }
+
+                                // Pastikan jika kelas kosong atau strip (-), diisi penuh menjadi XII
+                                if (empty($kelas_siswa) || $kelas_siswa == '-') {
+                                    $kelas_siswa = 'XII';
                                 }
 
                                 $poin = intval($row['poin'] ?? $row['jml_poin'] ?? 0);
