@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include 'includes/cek_session.php';
@@ -131,92 +130,150 @@ if (!$query_siswa || !$query_kelas || !$query_ta) {
     <title>Edit Penempatan Siswa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
+    <style>
+        /* Styling Sidebar */
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: #fff;
+        }
+        .sidebar h3 {
+            font-size: 1.25rem;
+            padding: 1rem;
+            color: #fff;
+            border-bottom: 1px solid #373b3e;
+        }
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.2rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #fff;
+            background-color: #0d6efd;
+            border-radius: 0.375rem;
+        }
+        .sidebar .nav-link.logout {
+            color: #dc3545;
+        }
+        .sidebar .nav-link.logout:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-light">
 
-<div class="container py-4">
-    <h2>Edit Penempatan Siswa</h2>
-    <p>Form untuk mengubah penempatan kelas siswa.</p>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse px-3 py-4">
+            <h3 class="mb-3">Pelanggaran Siswa</h3>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.php">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="kelola_siswa.php">Kelola Siswa</a></li>
+                <li class="nav-item"><a class="nav-link" href="kelola_guru.php">Kelola Guru</a></li>
+                <li class="nav-item"><a class="nav-link" href="kelola_kelas.php">Kelola Kelas</a></li>
+                <li class="nav-item"><a class="nav-link" href="kelola_tahun_ajaran.php">Kelola Tahun Ajaran</a></li>
+                <li class="nav-item"><a class="nav-link" href="kelola_wali_kelas.php">Kelola Wali Kelas</a></li>
+                <li class="nav-item"><a class="nav-link" href="kelola_kategori_pelanggaran.php">Kelola Kategori Pelanggaran</a></li>
+                <li class="nav-item"><a class="nav-link" href="kelola_jenis_pelanggaran.php">Kelola Jenis Pelanggaran</a></li>
+                <li class="nav-item"><a class="nav-link active" href="penempatan_siswa.php">Penempatan Siswa</a></li>
+                <li class="nav-item"><a class="nav-link" href="laporan.php">Laporan</a></li>
+                <li class="nav-item"><a class="nav-link" href="about_me.php">About Me</a></li>
+            </ul>
+            <hr class="text-secondary">
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link logout" href="logout.php">Logout</a></li>
+            </ul>
+        </nav>
 
-    <?php if ($error !== '') { ?>
-        <div class="alert alert-danger">
-            <?= htmlspecialchars($error); ?>
-        </div>
-    <?php } ?>
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div class="container mt-2">
+                <div class="row justify-content-center">
+                    <div class="col-md-10">
+                        <div class="card shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="mb-0">Edit Penempatan Siswa</h4>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Form untuk mengubah penempatan kelas siswa.</p>
 
-    <form method="POST"
-          action="edit_penempatan_siswa.php?id=<?= $id; ?>">
+                                <?php if ($error !== '') { ?>
+                                    <div class="alert alert-danger">
+                                        <?= htmlspecialchars($error); ?>
+                                    </div>
+                                <?php } ?>
 
-        <div class="mb-3">
-            <label class="form-label">Pilih Siswa</label>
-            <select name="siswa_id" class="form-select" required>
-                <option value="">-- Pilih Siswa --</option>
+                                <form method="POST" action="edit_penempatan_siswa.php?id=<?= $id; ?>">
+                                    <div class="mb-3">
+                                        <label class="form-label">Pilih Siswa</label>
+                                        <select name="siswa_id" class="form-select" required>
+                                            <option value="">-- Pilih Siswa --</option>
+                                            <?php while ($s = mysqli_fetch_assoc($query_siswa)) { ?>
+                                                <option value="<?= (int) $s['id']; ?>"
+                                                    <?= ((int) $row['siswa_id'] === (int) $s['id']) ? 'selected' : ''; ?>>
+                                                    <?= htmlspecialchars($s['nis'] . ' - ' . $s['nama']); ?>
+                                                </option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
 
-                <?php while ($s = mysqli_fetch_assoc($query_siswa)) { ?>
-                    <option value="<?= (int) $s['id']; ?>"
-                        <?= ((int) $row['siswa_id'] === (int) $s['id'])
-                            ? 'selected' : ''; ?>>
-                        <?= htmlspecialchars($s['nis'] . ' - ' . $s['nama']); ?>
-                    </option>
-                <?php } ?>
-            </select>
-        </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Pilih Kelas</label>
+                                        <select name="kelas_id" class="form-select" required>
+                                            <option value="">-- Pilih Kelas --</option>
+                                            <?php while ($k = mysqli_fetch_assoc($query_kelas)) { ?>
+                                                <option value="<?= (int) $k['id']; ?>"
+                                                    <?= ((int) $row['kelas_id'] === (int) $k['id']) ? 'selected' : ''; ?>>
+                                                    <?= htmlspecialchars($k['nama']); ?>
+                                                </option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Pilih Kelas</label>
-            <select name="kelas_id" class="form-select" required>
-                <option value="">-- Pilih Kelas --</option>
+                                    <div class="mb-3">
+                                        <label class="form-label">Tahun Ajaran</label>
+                                        <select name="tahun_ajaran_id" class="form-select" required>
+                                            <option value="">-- Pilih Tahun Ajaran --</option>
+                                            <?php while ($ta = mysqli_fetch_assoc($query_ta)) { ?>
+                                                <option value="<?= (int) $ta['id']; ?>"
+                                                    <?= ((int) $row['tahun_ajaran_id'] === (int) $ta['id']) ? 'selected' : ''; ?>>
+                                                    <?= htmlspecialchars($ta['nama']); ?>
+                                                </option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
 
-                <?php while ($k = mysqli_fetch_assoc($query_kelas)) { ?>
-                    <option value="<?= (int) $k['id']; ?>"
-                        <?= ((int) $row['kelas_id'] === (int) $k['id'])
-                            ? 'selected' : ''; ?>>
-                        <?= htmlspecialchars($k['nama']); ?>
-                    </option>
-                <?php } ?>
-            </select>
-        </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <select name="status_aktif" class="form-select" required>
+                                            <option value="1" <?= ((int) $row['status_aktif'] === 1) ? 'selected' : ''; ?>>
+                                                Aktif
+                                            </option>
+                                            <option value="0" <?= ((int) $row['status_aktif'] === 0) ? 'selected' : ''; ?>>
+                                                Tidak Aktif
+                                            </option>
+                                        </select>
+                                    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Tahun Ajaran</label>
-            <select name="tahun_ajaran_id" class="form-select" required>
-                <option value="">-- Pilih Tahun Ajaran --</option>
-
-                <?php while ($ta = mysqli_fetch_assoc($query_ta)) { ?>
-                    <option value="<?= (int) $ta['id']; ?>"
-                        <?= ((int) $row['tahun_ajaran_id'] === (int) $ta['id'])
-                            ? 'selected' : ''; ?>>
-                        <?= htmlspecialchars($ta['nama']); ?>
-                    </option>
-                <?php } ?>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Status</label>
-            <select name="status_aktif" class="form-select" required>
-                <option value="1"
-                    <?= ((int) $row['status_aktif'] === 1)
-                        ? 'selected' : ''; ?>>
-                    Aktif
-                </option>
-
-                <option value="0"
-                    <?= ((int) $row['status_aktif'] === 0)
-                        ? 'selected' : ''; ?>>
-                    Tidak Aktif
-                </option>
-            </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Update Penempatan
-        </button>
-
-        <a href="penempatan_siswa.php" class="btn btn-secondary">
-            Kembali
-        </a>
-    </form>
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            Update Penempatan
+                                        </button>
+                                        <a href="penempatan_siswa.php" class="btn btn-secondary">
+                                            Kembali
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 </div>
 
 </body>

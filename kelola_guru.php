@@ -8,7 +8,7 @@ if ($_SESSION['role'] !== 'admin') {
     die("Akses ditolak!");
 }
 
-// Ambil data guru beserta email akun user (DIURUTKAN ASCENDING: 1, 2, 3...)
+// Ambil data guru beserta email akun user
 $sql = "SELECT 
             t_guru.*, 
             t_users.email AS email_user 
@@ -21,18 +21,6 @@ $query = mysqli_query($koneksi, $sql);
 if (!$query) {
     die("Query data guru gagal: " . mysqli_error($koneksi));
 }
-
-// Ambil akun yang role-nya guru
-$sql_user = "SELECT id, name, email 
-             FROM t_users 
-             WHERE role = 'guru' 
-             ORDER BY name ASC";
-
-$query_user = mysqli_query($koneksi, $sql_user);
-
-if (!$query_user) {
-    die("Query akun guru gagal: " . mysqli_error($koneksi));
-}
 ?>
 
 <!DOCTYPE html>
@@ -44,57 +32,63 @@ if (!$query_user) {
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <!-- DataTables Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: #fff;
+        }
+        .sidebar h4 {
+            font-size: 1.25rem;
+            padding: 0.5rem 0;
+            color: #fff;
+            border-bottom: 1px solid #373b3e;
+        }
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.2rem;
+            border-radius: 0.375rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #fff;
+            background-color: #0d6efd;
+        }
+        .sidebar .nav-link.logout {
+            color: #dc3545;
+        }
+        .sidebar .nav-link.logout:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-light">
 
 <div class="container-fluid">
     <div class="row">
         <!-- SIDEBAR -->
-        <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
-            <h4 class="text-white mb-4">
-                Pelanggaran Siswa
-            </h4>
-            <ul class="nav nav-pills flex-column">
-                <li class="nav-item mb-2">
-                    <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_guru.php" class="nav-link active">Kelola Guru</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
-                </li>
-                <hr class="text-secondary">
-                <li class="nav-item mb-2">
-                    <a href="logout.php" class="nav-link text-danger">Logout</a>
-                </li>
+        <div class="col-md-3 col-lg-2 sidebar p-3">
+            <h4 class="mb-4">Pelanggaran Siswa</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2"><a href="dashboard.php" class="nav-link">Dashboard</a></li>
+                <li class="nav-item mb-2"><a href="kelola_siswa.php" class="nav-link">Kelola Siswa</a></li>
+                <li class="nav-item mb-2"><a href="kelola_guru.php" class="nav-link active">Kelola Guru</a></li>
+                <li class="nav-item mb-2"><a href="kelola_kelas.php" class="nav-link">Kelola Kelas</a></li>
+                <li class="nav-item mb-2"><a href="kelola_tahun_ajaran.php" class="nav-link">Kelola Tahun Ajaran</a></li>
+                <li class="nav-item mb-2"><a href="kelola_wali_kelas.php" class="nav-link">Kelola Wali Kelas</a></li>
+                <li class="nav-item mb-2"><a href="kelola_kategori_pelanggaran.php" class="nav-link">Kelola Kategori Pelanggaran</a></li>
+                <li class="nav-item mb-2"><a href="kelola_jenis_pelanggaran.php" class="nav-link">Kelola Jenis Pelanggaran</a></li>
+                <li class="nav-item mb-2"><a href="penempatan_siswa.php" class="nav-link">Penempatan Siswa</a></li>
+                <li class="nav-item mb-2"><a href="pelanggaran.php" class="nav-link">Laporan</a></li>
+                <li class="nav-item mb-2"><a href="tentang_saya.php" class="nav-link">About Me</a></li>
+            </ul>
+            <hr class="text-secondary">
+            <ul class="nav flex-column">
+                <li class="nav-item"><a href="logout.php" class="nav-link logout">Logout</a></li>
             </ul>
         </div>
 
@@ -104,10 +98,7 @@ if (!$query_user) {
 
             <?php if (isset($_SESSION['pesan'])) { ?>
                 <div class="alert alert-success mt-3">
-                    <?php
-                    echo $_SESSION['pesan'];
-                    unset($_SESSION['pesan']);
-                    ?>
+                    <?= $_SESSION['pesan']; unset($_SESSION['pesan']); ?>
                 </div>
             <?php } ?>
 
@@ -140,16 +131,16 @@ if (!$query_user) {
                 </div>
 
                 <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Akun Guru</label>
+                    <label class="col-sm-2 col-form-label">Password</label>
                     <div class="col-sm-6">
-                        <select name="user_id" class="form-control" required>
-                            <option value="">-- Pilih Akun Guru --</option>
-                            <?php while ($user = mysqli_fetch_assoc($query_user)) { ?>
-                                <option value="<?= $user['id']; ?>">
-                                    <?= htmlspecialchars($user['name']); ?> (<?= htmlspecialchars($user['email']); ?>)
-                                </option>
-                            <?php } ?>
-                        </select>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Konfirmasi Password</label>
+                    <div class="col-sm-6">
+                        <input type="password" name="konfirmasi_password" class="form-control" required>
                     </div>
                 </div>
 
@@ -175,7 +166,6 @@ if (!$query_user) {
             <h4 class="mb-3">Data Guru</h4>
 
             <div class="table-responsive">
-                <!-- Berikan ID tabelGuru untuk DataTables -->
                 <table id="tabelGuru" class="table table-bordered table-striped align-middle" style="width:100%">
                     <thead class="table-dark">
                         <tr>
@@ -184,43 +174,30 @@ if (!$query_user) {
                             <th>Nama</th>
                             <th>Email</th>
                             <th>Status</th>
-                            <th>User ID</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php
-                        if ($query && mysqli_num_rows($query) > 0) {
-                            while ($guru = mysqli_fetch_assoc($query)) {
-                        ?>
+                        <?php if ($query && mysqli_num_rows($query) > 0) {
+                            while ($guru = mysqli_fetch_assoc($query)) { ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($guru['id']); ?></td>
-                                <td><?php echo htmlspecialchars($guru['nip']); ?></td>
-                                <td><?php echo htmlspecialchars($guru['nama']); ?></td>
-                                <td><?php echo htmlspecialchars($guru['email'] ?? $guru['email_user'] ?? '-'); ?></td>
+                                <td><?= htmlspecialchars($guru['id']); ?></td>
+                                <td><?= htmlspecialchars($guru['nip']); ?></td>
+                                <td><?= htmlspecialchars($guru['nama']); ?></td>
+                                <td><?= htmlspecialchars($guru['email'] ?? $guru['email_user'] ?? '-'); ?></td>
                                 <td>
-                                    <?php 
-                                    if (isset($guru['status_aktif']) && $guru['status_aktif'] == 1) {
-                                        echo '<span class="badge bg-success">Aktif</span>';
-                                    } else {
-                                        echo '<span class="badge bg-danger">Tidak Aktif</span>';
-                                    }
-                                    ?>
+                                    <?= ($guru['status_aktif'] == 1) ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif</span>'; ?>
                                 </td>
-                                <td><?php echo htmlspecialchars($guru['user_id']); ?></td>
                                 <td>
-                                    <a href="edit_guru.php?id=<?php echo $guru['id']; ?>" class="btn btn-warning btn-sm mb-1">Edit</a>
-                                    <a href="hapus_guru.php?id=<?php echo $guru['id']; ?>" 
+                                    <a href="edit_guru.php?id=<?= $guru['id']; ?>" class="btn btn-warning btn-sm mb-1">Edit</a>
+                                    <a href="proses_guru.php?aksi=hapus&id=<?= $guru['id']; ?>" 
                                        class="btn btn-danger btn-sm"
                                        onclick="return confirm('Yakin ingin menghapus data guru ini?')">
                                         Hapus
                                     </a>
                                 </td>
                             </tr>
-                        <?php 
-                            }
-                        }
-                        ?>
+                        <?php } } ?>
                     </tbody>
                 </table>
             </div>
@@ -231,12 +208,9 @@ if (!$query_user) {
 <!-- JQUERY & BOOTSTRAP JS -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- DATATABLES JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-<!-- INISIALISASI DATATABLE -->
 <script>
     $(document).ready(function() {
         $('#tabelGuru').DataTable({
@@ -245,13 +219,9 @@ if (!$query_user) {
                 "zeroRecords": "Data guru tidak ditemukan",
                 "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
                 "infoEmpty": "Tidak ada data yang tersedia",
-                "infoFiltered": "(difilter dari total _MAX_ data)",
                 "search": "Cari Guru:",
                 "paginate": {
-                    "first": "Pertama",
-                    "last": "Terakhir",
-                    "next": "Selanjutnya",
-                    "previous": "Sebelumnya"
+                    "first": "Pertama", "last": "Terakhir", "next": "Selanjutnya", "previous": "Sebelumnya"
                 }
             },
             "pageLength": 10,
