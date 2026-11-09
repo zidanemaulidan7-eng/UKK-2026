@@ -87,7 +87,7 @@ if ($_SESSION['role'] !== 'admin') {
                 <li class="nav-item"><a class="nav-link" href="kelola_kategori_pelanggaran.php">Kelola Kategori Pelanggaran</a></li>
                 <li class="nav-item"><a class="nav-link" href="pelanggaran.php">Kelola Jenis Pelanggaran</a></li>
                 <li class="nav-item"><a class="nav-link" href="penempatan_siswa.php">Penempatan Siswa</a></li>
-                <li class="nav-item"><a class="nav-link" href="laporan.php">Laporan</a></li>
+                <li class="nav-item"><a class="nav-link" href="pelanggaran.php">Laporan</a></li>
                 <li class="nav-item"><a class="nav-link active" href="tentang_saya.php">About Me</a></li>
             </ul>
         </div>
