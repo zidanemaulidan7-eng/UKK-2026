@@ -1,6 +1,8 @@
 <?php
 session_start();
 include 'includes/cek_session.php';
+// Contoh koneksi database (sesuaikan dengan file koneksi Anda)
+// include 'includes/koneksi.php'; 
 
 if ($_SESSION['role'] !== 'admin') {
     die("Akses ditolak!");
@@ -15,7 +17,6 @@ if ($_SESSION['role'] !== 'admin') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Tambah Kelas</title>
     <style>
-        /* Styling tambahan untuk menyesuaikan dengan sidebar di gambar */
         #sidebar {
             background-color: #212529;
             min-height: 100vh;
@@ -44,7 +45,7 @@ if ($_SESSION['role'] !== 'admin') {
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
+        <!-- Sidebar (tetap sama) -->
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block p-3 collapse">
             <div class="position-sticky">
                 <h4 class="text-white px-2 mb-4">Pelanggaran Siswa</h4>
@@ -117,10 +118,29 @@ if ($_SESSION['role'] !== 'admin') {
                                         </div>
                                     </div>
 
+                                    <!-- BAGIAN JURUSAN DIUBAH MENJADI DROPDOWN -->
                                     <div class="mb-3 row">
                                         <label class="col-sm-3 col-form-label">Jurusan</label>
                                         <div class="col-sm-9">
-                                            <input type="text" name="jurusan" class="form-control" placeholder="Contoh: Rekayasa Perangkat Lunak" required>
+                                            <select name="jurusan" class="form-control" required>
+                                                <option value="" disabled selected>-- Pilih Jurusan --</option>
+                                                <!-- Jika data jurusan statis/manual -->
+                                                <option value="Rekayasa Perangkat Lunak">Rekayasa Perangkat Lunak</option>
+                                                <option value="Teknik Komputer dan Jaringan">Teknik Komputer dan Jaringan</option>
+                                                <option value="Multimedia">Multimedia</option>
+                                                <option value="Akuntansi">Akuntansi</option>
+                                                <option value="Perkantoran">Perkantoran</option>
+
+                                                <!-- ATAU Jika mengambil data dari database, gunakan perulangan seperti ini:
+                                                <?php 
+                                                /* 
+                                                $query_jurusan = mysqli_query($koneksi, "SELECT * FROM jurusan"); // sesuaikan tabel Anda
+                                                while ($j = mysqli_fetch_assoc($query_jurusan)) {
+                                                    echo '<option value="'.$j['nama_jurusan'].'">'.$j['nama_jurusan'].'</option>';
+                                                }
+                                                */
+                                                ?> -->
+                                            </select>
                                         </div>
                                     </div>
 
@@ -152,3 +172,8 @@ if ($_SESSION['role'] !== 'admin') {
 
 </body>
 </html>
+
+<ElicitationsGroup message="Berikut beberapa opsi lanjutan untuk pengembangan fitur kelas Anda:">
+  <Elicitation label="Cara menerapkan dropdown jurusan ini ke form Edit Kelas" query="Bagaimana cara menyesuaikan dropdown jurusan ini agar bisa menampilkan data yang sudah terpilih saat form edit kelas dibuka?" />
+  <Elicitation label="Membuat tabel relasi database untuk Jurusan" query="Bagaimana cara membuat tabel master jurusan di database agar data jurusan lebih terstruktur dan dinamis?" />
+</ElicitationsGroup>

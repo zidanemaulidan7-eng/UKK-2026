@@ -3,36 +3,48 @@ session_start();
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-// Proses simpan data jika form disubmit
+// Proses simpan data saat form disubmit
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $tahun_ajaran_id = $_POST['tahun_ajaran_id'];
-    $kelas_id = $_POST['kelas_id'];
-    $guru_id = $_POST['guru_id'];
-    $tanggal_mulai = $_POST['tanggal_mulai'];
-    $tanggal_selesai = $_POST['tanggal_selesai'];
-    $status_aktif = $_POST['status_aktif'];
+    $tahun_ajaran_id = (int) $_POST['tahun_ajaran_id'];
+    $kelas_id        = (int) $_POST['kelas_id'];
+    $guru_id         = (int) $_POST['guru_id'];
+    $tanggal_mulai   = mysqli_real_escape_string($koneksi, $_POST['tanggal_mulai']);
+    $tanggal_selesai = mysqli_real_escape_string($koneksi, $_POST['tanggal_selesai']);
+    $status_aktif    = 1; // Otomatis aktif atau dari form
 
-    if (!empty($tahun_ajaran_id) && !empty($kelas_id) && !empty($guru_id) && !empty($tanggal_mulai) && !empty($tanggal_selesai)) {
-        $stmt = mysqli_prepare($koneksi, "INSERT INTO t_wali_kelas (tahun_ajaran_id, kelas_id, guru_id, tanggal_mulai, tanggal_selesai, status_aktif) VALUES (?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($stmt, "iiissi", $tahun_ajaran_id, $kelas_id, $guru_id, $tanggal_mulai, $tanggal_selesai, $status_aktif);
-
-        if (mysqli_stmt_execute($stmt)) {
+    // Validasi: Cek apakah kelas ini sudah punya wali kelas di tahun ajaran yang sama
+    $cek_kelas = mysqli_query($koneksi, "SELECT * FROM t_wali_kelas WHERE kelas_id = $kelas_id AND tahun_ajaran_id = $tahun_ajaran_id");
+    if (mysqli_num_rows($cek_kelas) > 0) {
+        $error = "Gagal! Kelas ini sudah memiliki wali kelas pada tahun ajaran tersebut.";
+    } else {
+        // Simpan data
+        $query_insert = "INSERT INTO t_wali_kelas (tahun_ajaran_id, kelas_id, guru_id, tanggal_mulai, tanggal_selesai, status_aktif) 
+                         VALUES ('$tahun_ajaran_id', '$kelas_id', '$guru_id', '$tanggal_mulai', '$tanggal_selesai', '$status_aktif')";
+        
+        if (mysqli_query($koneksi, $query_insert)) {
             $_SESSION['pesan'] = "Data wali kelas berhasil ditambahkan!";
             header("Location: kelola_wali_kelas.php");
             exit();
         } else {
-            $error = "Gagal menyimpan data: " . mysqli_error($koneksi);
+            $error = "Gagal menyimpan ke database: " . mysqli_error($koneksi);
         }
-        mysqli_stmt_close($stmt);
-    } else {
-        $error = "Semua field wajib diisi!";
     }
 }
 
-// Ambil data untuk dropdown
-$query_ta = mysqli_query($koneksi, "SELECT * FROM t_tahun_ajaran ORDER BY id DESC");
-$query_kelas = mysqli_query($koneksi, "SELECT * FROM t_kelas ORDER BY nama ASC");
-$query_guru = mysqli_query($koneksi, "SELECT * FROM t_guru ORDER BY nama ASC");
+// 1. Ambil HANYA Tahun Ajaran yang AKTIF saja
+$query_tahun = mysqli_query($koneksi, "SELECT * FROM t_tahun_ajaran WHERE status_aktif = 1");
+
+// 2. Ambil Data Kelas yang belum punya wali kelas
+$query_kelas = mysqli_query($koneksi, "
+    SELECT * FROM t_kelas 
+    WHERE id NOT IN (SELECT kelas_id FROM t_wali_kelas)
+");
+
+// 3. Ambil Data Guru yang belum menjadi wali kelas (opsional, jika 1 guru hanya boleh 1 kelas)
+$query_guru = mysqli_query($koneksi, "
+    SELECT * FROM t_guru 
+    WHERE id NOT IN (SELECT guru_id FROM t_wali_kelas)
+");
 ?>
 
 <!DOCTYPE html>
@@ -40,133 +52,84 @@ $query_guru = mysqli_query($koneksi, "SELECT * FROM t_guru ORDER BY nama ASC");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <title>Tambah Wali Kelas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- SIDEBAR -->
-        <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
-            <h4 class="text-white mb-4">
-                Pelanggaran Siswa
-            </h4>
-            <ul class="nav nav-pills flex-column">
-                <li class="nav-item mb-2">
-                    <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_wali_kelas.php" class="nav-link active">Kelola Wali Kelas</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
-                </li>
-                <hr class="text-secondary">
-                <li class="nav-item mb-2">
-                    <a href="logout.php" class="nav-link text-danger">Logout</a>
-                </li>
-            </ul>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Form Tambah Wali Kelas</h4>
+                </div>
+                <div class="card-body">
+                    
+                    <?php if (isset($error)) { ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Ditolak!</strong> <?= $error; ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php } ?>
+
+                    <form action="" method="POST">
+                        <!-- Tahun Ajaran (Hanya yang Aktif) -->
+                        <div class="mb-3">
+                            <label class="form-label">Tahun Ajaran (Aktif)</label>
+                            <select name="tahun_ajaran_id" class="form-select" required>
+                                <option value="" disabled selected>-- Pilih Tahun Ajaran Aktif --</option>
+                                <?php while ($ta = mysqli_fetch_assoc($query_tahun)) { ?>
+                                    <option value="<?= $ta['id']; ?>"><?= htmlspecialchars($ta['nama']); ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+
+                        <!-- Kelas (Hanya yang belum punya wali kelas) -->
+                        <div class="mb-3">
+                            <label class="form-label">Pilih Kelas</label>
+                            <select name="kelas_id" class="form-select" required>
+                                <option value="" disabled selected>-- Pilih Kelas --</option>
+                                <?php while ($k = mysqli_fetch_assoc($query_kelas)) { ?>
+                                    <option value="<?= $k['id']; ?>"><?= htmlspecialchars($k['nama']); ?></option>
+                                <?php } ?>
+                            </select>
+                            <div class="form-text text-muted">Kelas yang sudah memiliki wali kelas tidak akan muncul di pilihan ini.</div>
+                        </div>
+
+                        <!-- Guru (Hanya guru yang belum jadi wali kelas) -->
+                        <div class="mb-3">
+                            <label class="form-label">Pilih Guru</label>
+                            <select name="guru_id" class="form-select" required>
+                                <option value="" disabled selected>-- Pilih Guru --</option>
+                                <?php while ($g = mysqli_fetch_assoc($query_guru)) { ?>
+                                    <option value="<?= $g['id']; ?>"><?= htmlspecialchars($g['nama']); ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tanggal Mulai</label>
+                            <input type="date" name="tanggal_mulai" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tanggal Selesai</label>
+                            <input type="date" name="tanggal_selesai" class="form-control" required>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="kelola_wali_kelas.php" class="btn btn-secondary">Batal</a>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
         </div>
-
-        <!-- KONTEN UTAMA -->
-        <main class="col-md-9 col-lg-10 p-4">
-            <h2>Tambah Wali Kelas</h2>
-            <p>Form untuk menambahkan data penugasan wali kelas baru.</p>
-
-            <?php if (isset($error)) { ?>
-                <div class="alert alert-danger"><?= $error; ?></div>
-            <?php } ?>
-
-            <hr>
-
-            <form action="" method="POST">
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Tahun Ajaran</label>
-                    <div class="col-sm-6">
-                        <select name="tahun_ajaran_id" class="form-control" required>
-                            <option value="">-- Pilih Tahun Ajaran --</option>
-                            <?php while ($ta = mysqli_fetch_assoc($query_ta)) { ?>
-                                <option value="<?= $ta['id']; ?>"><?= htmlspecialchars($ta['nama']); ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Kelas</label>
-                    <div class="col-sm-6">
-                        <select name="kelas_id" class="form-control" required>
-                            <option value="">-- Pilih Kelas --</option>
-                            <?php while ($kls = mysqli_fetch_assoc($query_kelas)) { ?>
-                                <option value="<?= $kls['id']; ?>"><?= htmlspecialchars($kls['nama']); ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Guru (Wali Kelas)</label>
-                    <div class="col-sm-6">
-                        <select name="guru_id" class="form-control" required>
-                            <option value="">-- Pilih Guru --</option>
-                            <?php while ($guru = mysqli_fetch_assoc($query_guru)) { ?>
-                                <option value="<?= $guru['id']; ?>"><?= htmlspecialchars($guru['nama']); ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Tanggal Mulai</label>
-                    <div class="col-sm-6">
-                        <input type="date" name="tanggal_mulai" class="form-control" required>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Tanggal Selesai</label>
-                    <div class="col-sm-6">
-                        <input type="date" name="tanggal_selesai" class="form-control" required>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Status Aktif</label>
-                    <div class="col-sm-6">
-                        <select name="status_aktif" class="form-control" required>
-                            <option value="1">Aktif</option>
-                            <option value="0">Tidak Aktif</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <div class="col-sm-6 offset-sm-2">
-                        <button type="submit" class="btn btn-primary">Simpan Wali Kelas</button>
-                        <a href="kelola_wali_kelas.php" class="btn btn-secondary">Kembali</a>
-                    </div>
-                </div>
-            </form>
-        </main>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

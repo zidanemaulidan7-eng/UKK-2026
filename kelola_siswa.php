@@ -94,14 +94,14 @@ $query = mysqli_query($koneksi, $sql);
                 <div class="mb-3 row">
                     <label class="col-sm-2 col-form-label">NIS</label>
                     <div class="col-sm-6">
-                        <input type="text" name="nis" class="form-control" required>
+                        <input type="number" name="nis" class="form-control" oninput="if(this.value.length > 15) this.value = this.value.slice(0, 15);" required>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <label class="col-sm-2 col-form-label">NISN</label>
                     <div class="col-sm-6">
-                        <input type="text" name="nisn" class="form-control" required>
+                        <input type="number" name="nisn" class="form-control" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);" required>
                     </div>
                 </div>
 

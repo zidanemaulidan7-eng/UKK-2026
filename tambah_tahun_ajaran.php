@@ -3,165 +3,100 @@ session_start();
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-// Proses Tambah Tahun Ajaran
-if (isset($_POST['simpan'])) {$input_tahun = mysqli_real_escape_string($koneksi,$_POST['tahun_ajaran']);
-    $input_semester = mysqli_real_escape_string($koneksi, $_POST['semester']);$input_status = mysqli_real_escape_string($koneksi,$_POST['status']);
+// Jika tombol Simpan ditekan
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $tahun_ajaran    = mysqli_real_escape_string($koneksi, $_POST['tahun_ajaran']);
+    $tanggal_mulai   = mysqli_real_escape_string($koneksi, $_POST['tanggal_mulai']);
+    $tanggal_selesai = mysqli_real_escape_string($koneksi, $_POST['tanggal_selesai']);
+    $status_aktif    = (int) $_POST['status_aktif']; // 1 = Aktif, 0 = Tidak Aktif
 
-    // 1. Deteksi nama tabel yang ada di database
-    $nama_tabel = 't_tahun_ajaran';
-    $check_table = mysqli_query($koneksi, "SHOW TABLES LIKE '$nama_tabel'");
-    if (!$check_table || mysqli_num_rows($check_table) == 0) {$nama_tabel = 'tahun_ajaran';
-    }
-
-    // 2. Ambil daftar kolom asli dari tabel (abaikan kolom ID / Primary Key Auto Increment)
-    $col_query = mysqli_query($koneksi, "SHOW COLUMNS FROM $nama_tabel");
-    $fields = [];
-    if ($col_query) {
-        while ($col = mysqli_fetch_assoc($col_query)) {
-            if (strtolower($col['Extra']) === 'auto_increment') {
-                continue; // Lewati primary key ID
-            }
-            $fields[] =$col['Field'];
+    // ATURAN KETAT: Jika memilih status Aktif (1)
+    if ($status_aktif === 1) {
+        // Cek apakah sudah ada tahun ajaran lain yang berstatus aktif
+        $cek_aktif = mysqli_query($koneksi, "SELECT * FROM t_tahun_ajaran WHERE status_aktif = 1");
+        
+        if (mysqli_num_rows($cek_aktif) > 0) {
+            // Tolak penyimpanan dan siapkan pesan error
+            $error = "Gagal ditolak! Sudah ada tahun ajaran yang berstatus Aktif. Harap nonaktifkan tahun ajaran aktif yang lain terlebih dahulu.";
         }
     }
 
-    $data_insert = [];
-
-    // 3. Cocokkan berdasarkan nama kolom fleksibel (Tanpa operator ||)
-    foreach ($fields as $field) {$f_lower = strtolower($field);$is_tahun = false;
-        $is_semester = false;
-        $is_status = false;
-
-        if (strpos($f_lower, 'tahun') !== false) {$is_tahun = true; }
-        if (strpos($f_lower, 'ajar') !== false) {$is_tahun = true; }
-        if (strpos($f_lower, 'nama') !== false) {$is_tahun = true; }
-
-        if (strpos($f_lower, 'sem') !== false) {$is_semester = true; }
-
-        if (strpos($f_lower, 'stat') !== false) {$is_status = true; }
-        if (strpos($f_lower, 'ket') !== false) {$is_status = true; }
-        if (strpos($f_lower, 'aktif') !== false) {$is_status = true; }
-
-        if ($is_tahun) {$data_insert[$field] =$input_tahun;
-        } elseif ($is_semester) {$data_insert[$field] =$input_semester;
-        } elseif ($is_status) {$data_insert[$field] =$input_status;
-        }
-    }
-
-    // 4. Jika kecocokan nama tidak ditemukan, gunakan urutan posisi kolom asli
-    if (empty($data_insert) && count($fields) >= 1) {
-        if (isset($fields[0])) {$data_insert[$fields[0]] =$input_tahun; }
-        if (isset($fields[1])) {$data_insert[$fields[1]] =$input_semester; }
-        if (isset($fields[2])) {$data_insert[$fields[2]] =$input_status; }
-    }
-
-    // 5. Eksekusi Query Insert secara dinamis
-    if (!empty($data_insert)) {$columns_str = "`" . implode("`, `", array_keys($data_insert)) . "`";
-        $values_str  = "'" . implode("', '", array_values($data_insert)) . "'";
-
-        $query = "INSERT INTO `$nama_tabel` ($columns_str) VALUES ($values_str)";
-
-        if (mysqli_query($koneksi,$query)) {
-            echo "<script>alert('Tahun ajaran berhasil ditambahkan!'); window.location='kelola_tahun_ajaran.php';</script>";
+    // Jika lolos validasi (tidak ada error), lakukan INSERT
+    if (!isset($error)) {
+        $query = "INSERT INTO t_tahun_ajaran (nama, tanggal_mulai, tanggal_selesai, status_aktif) 
+                  VALUES ('$tahun_ajaran', '$tanggal_mulai', '$tanggal_selesai', '$status_aktif')";
+        
+        if (mysqli_query($koneksi, $query)) {
+            $_SESSION['pesan'] = "Tahun ajaran berhasil ditambahkan!";
+            header("Location: kelola_tahun_ajaran.php");
             exit();
         } else {
-            $error_msg = addslashes(mysqli_error($koneksi));
-            echo "<script>alert('Gagal menambah data: $error_msg');</script>";
+            $error = "Gagal menyimpan ke database: " . mysqli_error($koneksi);
         }
-    } else {
-        echo "<script>alert('Gagal mendeteksi kolom pada tabel $nama_tabel!');</script>";
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Tahun Ajaran</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>Tambah Tahun Ajaran - Pelanggaran Siswa</title>
 </head>
-<body>
+<body class="bg-light">
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- SIDEBAR -->
-        <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
-            <h4 class="text-white mb-4">Pelanggaran Siswa</h4>
-            <ul class="nav nav-pills flex-column">
-                <li class="nav-item mb-2">
-                    <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_tahun_ajaran.php" class="nav-link active">Kelola Tahun Ajaran</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
-                </li>
-                <hr class="text-secondary">
-                <li class="nav-item mb-2">
-                    <a href="logout.php" class="nav-link text-danger">Logout</a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- KONTEN UTAMA -->
-        <main class="col-md-9 col-lg-10 p-4">
-            <h2>Tambah Tahun Ajaran</h2>
-            <hr>
-
-            <div class="card shadow-sm col-md-8">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    Form Tambah Tahun Ajaran
+                    <h4 class="mb-0">Form Tambah Tahun Ajaran</h4>
                 </div>
                 <div class="card-body">
+                    
+                    <!-- Menampilkan Pesan Penolakan -->
+                    <?php if (isset($error)) { ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Ditolak!</strong> <?= $error; ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php } ?>
+
                     <form action="" method="POST">
                         <div class="mb-3">
-                            <label for="tahun_ajaran" class="form-label">Tahun Ajaran</label>
-                            <input type="text" class="form-control" name="tahun_ajaran" required placeholder="Contoh: 2025/2026">
+                            <label class="form-label">Tahun Ajaran</label>
+                            <input type="text" name="tahun_ajaran" class="form-control" placeholder="Contoh: 2025/2026" required>
                         </div>
+
                         <div class="mb-3">
-                            <label for="semester" class="form-label">Semester</label>
-                            <select name="semester" class="form-select" required>
-                                <option value="">-- Pilih Semester --</option>
-                                <option value="Ganjil">Ganjil</option>
-                                <option value="Genap">Genap</option>
+                            <label class="form-label">Tanggal Mulai</label>
+                            <input type="date" name="tanggal_mulai" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tanggal Selesai</label>
+                            <input type="date" name="tanggal_selesai" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status_aktif" class="form-select" required>
+                                <option value="1">Aktif</option>
+                                <option value="0">Tidak Aktif</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Status</label>
-                            <select name="status" class="form-select" required>
-                                <option value="Aktif">Aktif</option>
-                                <option value="Tidak Aktif">Tidak Aktif</option>
-                            </select>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="kelola_tahun_ajaran.php" class="btn btn-secondary">Batal</a>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
-                        <a href="kelola_tahun_ajaran.php" class="btn btn-secondary">Batal</a>
-                        <button type="submit" name="simpan" class="btn btn-primary">Simpan</button>
                     </form>
+
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 </div>
 
