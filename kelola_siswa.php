@@ -74,6 +74,12 @@ $query = mysqli_query($koneksi, $sql);
         <!-- KONTEN UTAMA -->
         <main class="col-md-9 col-lg-10 p-4">
             <h2>Kelola Siswa</h2>
+            <p>Halaman untuk mengelola data siswa.</p>
+
+            <!-- Tombol Tambah Siswa (Menyerupai Kelola Kelas) -->
+            <div class="mb-3">
+                <a href="tambah_siswa.php" class="btn btn-primary btn-sm">+ Tambah Siswa</a>
+            </div>
 
             <?php if (isset($_SESSION['pesan'])) { ?>
                 <div class="alert alert-success mt-3">
@@ -84,86 +90,15 @@ $query = mysqli_query($koneksi, $sql);
                 </div>
             <?php } ?>
 
-            <hr>
-
-            <h4 class="mb-3">Tambah Data Siswa</h4>
-
-            <form action="proses_siswa.php" method="POST">
-                <input type="hidden" name="aksi" value="tambah">
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">NIS</label>
-                    <div class="col-sm-6">
-                        <input type="number" name="nis" class="form-control" oninput="if(this.value.length > 15) this.value = this.value.slice(0, 15);" required>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">NISN</label>
-                    <div class="col-sm-6">
-                        <input type="number" name="nisn" class="form-control" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);" required>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Nama</label>
-                    <div class="col-sm-6">
-                        <input type="text" name="nama" class="form-control" required>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Jenis Kelamin</label>
-                    <div class="col-sm-6">
-                        <select name="jenis_kelamin" class="form-control" required>
-                            <option value="">-- Pilih --</option>
-                            <option value="L">Laki-laki</option>
-                            <option value="P">Perempuan</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Tanggal Lahir</label>
-                    <div class="col-sm-6">
-                        <input type="date" name="tanggal_lahir" class="form-control" required>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Alamat</label>
-                    <div class="col-sm-6">
-                        <textarea name="alamat" class="form-control" rows="3" required></textarea>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Status Aktif</label>
-                    <div class="col-sm-6">
-                        <select name="status_aktif" class="form-control" required>
-                            <option value="1">Aktif</option>
-                            <option value="0">Tidak Aktif</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <div class="col-sm-6 offset-sm-2">
-                        <button type="submit" class="btn btn-primary">Tambah Siswa</button>
-                    </div>
-                </div>
-            </form>
-
             <hr class="my-4">
 
             <h4 class="mb-3">Data Siswa</h4>
 
             <div class="table-responsive">
-                <!-- Berikan ID tabelSiswa untuk DataTables -->
                 <table id="tabelSiswa" class="table table-bordered table-striped align-middle" style="width:100%">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
+                            <th>No</th>
                             <th>NIS</th>
                             <th>NISN</th>
                             <th>Nama</th>
@@ -177,10 +112,11 @@ $query = mysqli_query($koneksi, $sql);
                     <tbody>
                         <?php
                         if ($query && mysqli_num_rows($query) > 0) {
+                            $no = 1;
                             while ($siswa = mysqli_fetch_assoc($query)) {
                         ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($siswa['id']); ?></td>
+                                <td><?php echo $no++; ?></td>
                                 <td><?php echo htmlspecialchars($siswa['nis']); ?></td>
                                 <td><?php echo htmlspecialchars($siswa['nisn']); ?></td>
                                 <td><?php echo htmlspecialchars($siswa['nama']); ?></td>
