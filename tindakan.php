@@ -83,7 +83,6 @@ if ($q_all_siswa) {
 
         <div class="card p-4 shadow-sm border-0">
             <div class="table-responsive">
-                <!-- Tambahkan ID tabelTindakan untuk DataTables -->
                 <table id="tabelTindakan" class="table table-bordered table-striped align-middle mb-0" style="width:100%">
                     <thead class="table-light">
                         <tr>
@@ -148,9 +147,15 @@ if ($q_all_siswa) {
                                     <td class="text-center"><span class="badge bg-danger"><?php echo htmlspecialchars($poin); ?></span></td>
                                     <td><span class="badge <?php echo $badge_class; ?>"><?php echo htmlspecialchars($status); ?></span></td>
                                     <td class="text-center">
-                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTindakan<?php echo $row['id']; ?>">
-                                            Proses
-                                        </button>
+                                        <?php if ($status === 'Selesai' || $status === 'Sudah Ditindak'): ?>
+                                            <!-- Jika sudah ditindak, tombol dikunci dan tidak bisa diklik -->
+                                            <button class="btn btn-secondary btn-sm" disabled>Selesai</button>
+                                        <?php else: ?>
+                                            <!-- Jika belum, tombol proses aktif -->
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTindakan<?php echo $row['id']; ?>">
+                                                Proses
+                                            </button>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
 
@@ -186,7 +191,7 @@ if ($q_all_siswa) {
                                     </div>
                                 </div>
 
-                                <?php
+                                <?php 
                                 $index++;
                             }
                         } else {
