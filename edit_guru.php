@@ -26,10 +26,6 @@ if (!$guru) {
     header("Location: kelola_guru.php");
     exit();
 }
-
-// Ambil akun yang role-nya guru untuk pilihan select
-$sql_user = "SELECT id, name, email FROM t_users WHERE role = 'guru' ORDER BY name ASC";
-$query_user = mysqli_query($koneksi, $sql_user);
 ?>
 
 <!DOCTYPE html>
@@ -38,7 +34,7 @@ $query_user = mysqli_query($koneksi, $sql_user);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>Edit Guru - <?= htmlspecialchars($guru['nama']); ?></title>
+    <title>Edit Guru - <?= htmlspecialchars($guru['nama'] ?? ''); ?></title>
     <style>
         /* Styling Sidebar */
         .sidebar {
@@ -102,65 +98,68 @@ $query_user = mysqli_query($koneksi, $sql_user);
             <div class="container mt-2">
                 <div class="row justify-content-center">
                     <div class="col-md-10">
-                        <div class="card shadow">
-                            <div class="card-header bg-primary text-white">
-                                <h4 class="mb-0">Edit Data Guru</h4>
+                        <div class="card shadow border-0">
+                            <div class="card-header bg-primary text-white py-3">
+                                <h4 class="mb-0 fs-5">Edit Data Guru</h4>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body p-4">
                                 <form action="proses_guru.php" method="POST">
                                     <!-- Kirim aksi edit dan id guru -->
                                     <input type="hidden" name="aksi" value="edit">
                                     <input type="hidden" name="id" value="<?= $guru['id']; ?>">
 
                                     <div class="mb-3 row">
-                                        <label class="col-sm-3 col-form-label">NIP</label>
+                                        <label class="col-sm-3 col-form-label fw-semibold">NIP</label>
                                         <div class="col-sm-9">
                                             <input type="text" name="nip" class="form-control" value="<?= htmlspecialchars($guru['nip']); ?>" required>
                                         </div>
                                     </div>
 
                                     <div class="mb-3 row">
-                                        <label class="col-sm-3 col-form-label">Nama Guru</label>
+                                        <label class="col-sm-3 col-form-label fw-semibold">Nama Guru</label>
                                         <div class="col-sm-9">
                                             <input type="text" name="nama" class="form-control" value="<?= htmlspecialchars($guru['nama']); ?>" required>
                                         </div>
                                     </div>
 
                                     <div class="mb-3 row">
-                                        <label class="col-sm-3 col-form-label">Email</label>
+                                        <label class="col-sm-3 col-form-label fw-semibold">Email</label>
                                         <div class="col-sm-9">
                                             <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($guru['email'] ?? ''); ?>" required>
                                         </div>
                                     </div>
 
                                     <div class="mb-3 row">
-                                        <label class="col-sm-3 col-form-label">Akun Guru</label>
+                                        <label class="col-sm-3 col-form-label fw-semibold">Password Baru</label>
                                         <div class="col-sm-9">
-                                            <select name="user_id" class="form-control" required>
-                                                <option value="">-- Pilih Akun Guru --</option>
-                                                <?php while ($user = mysqli_fetch_assoc($query_user)) { ?>
-                                                    <option value="<?= $user['id']; ?>" <?= ($guru['user_id'] == $user['id']) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($user['name']); ?> (<?= htmlspecialchars($user['email']); ?>)
-                                                    </option>
-                                                <?php } ?>
-                                            </select>
+                                            <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
+                                            <div class="form-text text-muted">Biarkan kosong jika password tidak ingin diganti.</div>
                                         </div>
                                     </div>
 
                                     <div class="mb-3 row">
-                                        <label class="col-sm-3 col-form-label">Status Aktif</label>
+                                        <label class="col-sm-3 col-form-label fw-semibold">Konfirmasi Password</label>
                                         <div class="col-sm-9">
-                                            <select name="status_aktif" class="form-control" required>
+                                            <input type="password" name="konfirmasi_password" class="form-control" placeholder="Ulangi password baru">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label fw-semibold">Status Aktif</label>
+                                        <div class="col-sm-9">
+                                            <select name="status_aktif" class="form-select" required>
                                                 <option value="1" <?= ($guru['status_aktif'] == 1) ? 'selected' : ''; ?>>Aktif</option>
                                                 <option value="0" <?= ($guru['status_aktif'] == 0) ? 'selected' : ''; ?>>Tidak Aktif</option>
                                             </select>
                                         </div>
                                     </div>
 
-                                    <div class="mb-3 row">
+                                    <hr class="my-4">
+
+                                    <div class="row">
                                         <div class="col-sm-9 offset-sm-3">
-                                            <button type="submit" class="btn btn-primary">Update Data</button>
-                                            <a href="kelola_guru.php" class="btn btn-secondary">Cancel</a>
+                                            <button type="submit" class="btn btn-primary px-4 me-2">Update Data</button>
+                                            <a href="kelola_guru.php" class="btn btn-secondary px-4">Cancel</a>
                                         </div>
                                     </div>
                                 </form>
