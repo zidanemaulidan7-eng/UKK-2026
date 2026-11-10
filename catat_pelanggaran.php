@@ -7,17 +7,12 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'guru') {
     exit;
 }
 
-// Ambil tahun ajaran yang sedang aktif dari database (menggunakan status_aktif)
-$q_ta = mysqli_query($koneksi, "SELECT * FROM t_tahun_ajaran WHERE status_aktif = 1 LIMIT 1");
-$d_ta = mysqli_fetch_assoc($q_ta);
-$tahun_ajaran_id = $d_ta['id'] ?? '';
-$nama_tahun_ajaran = $d_ta['nama'] ?? '2026/2027'; // Default jika belum diatur
-
 // Proses simpan data pelanggaran jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $siswa_id       = $_POST['siswa_id'] ?? '';
     $pelanggaran_id = $_POST['pelanggaran_id'] ?? '';
     $tanggal        = $_POST['tanggal'] ?? date('Y-m-d');
+    $tahun_ajaran   = '2025/2026'; // Tahun ajaran tetap
 
     // Ambil nama pelanggaran dan poin berdasarkan ID jenis pelanggaran yang dipilih
     $q_detail = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran WHERE id = '$pelanggaran_id'");
@@ -51,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catat Pelanggaran - Guru</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -60,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <style>
         body { min-height: 100vh; background-color: #f8f9fa; }
-        .sidebar { width: 250px; min-height: 100vh; background-color: #343a40; color: #fff; position: fixed; }
+        .sidebar { width: 250px; min-height: 100vh; background-color: #343a40; color: #fff; position: fixed; z-index: 100; }
         .sidebar .brand { padding: 1.5rem 1rem; font-size: 1.25rem; font-weight: bold; border-bottom: 1px solid #4f5962; }
         .sidebar a { color: #c2c7d0; text-decoration: none; padding: 12px 20px; display: block; }
         .sidebar a:hover, .sidebar a.active { background-color: #0d6efd; color: #fff; }
@@ -87,11 +83,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="card p-4 shadow-sm border-0 col-md-8">
             <form action="" method="POST">
-                <!-- Informasi Tahun Ajaran Aktif (Otomatis) -->
+                <!-- Informasi Tahun Ajaran Aktif (Dipaksa 2025/2026) -->
                 <div class="mb-3">
                     <label class="form-label fw-bold text-primary">Tahun Ajaran Aktif</label>
-                    <input type="text" class="form-control bg-light fw-bold" value="<?php echo htmlspecialchars($nama_tahun_ajaran); ?>" readonly>
-                    <input type="hidden" name="tahun_ajaran_id" value="<?php echo htmlspecialchars($tahun_ajaran_id); ?>">
+                    <input type="text" class="form-control bg-light fw-bold" value="2025/2026" readonly>
                 </div>
 
                 <!-- Dropdown Pilih Siswa -->

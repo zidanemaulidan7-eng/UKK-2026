@@ -7,113 +7,128 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'guru') {
     exit;
 }
 
-// Ambil semua data siswa terlebih dahulu ke dalam array untuk fallback
-$data_siswa = [];
-$q_all_siswa = mysqli_query($koneksi, "SELECT * FROM t_siswa ORDER BY id DESC");
-if ($q_all_siswa) {
-    while ($s = mysqli_fetch_assoc($q_all_siswa)) {
-        $data_siswa[] = $s;
-    }
-}
+// Ambil data riwayat pelanggaran dari database
+$query_riwayat = mysqli_query($koneksi, "
+    SELECT p.*, s.nama AS nama_siswa, s.nis 
+    FROM t_pelanggaran p 
+    LEFT JOIN t_siswa s ON p.id_t_siswa = s.id 
+    ORDER BY p.id DESC
+");
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riwayat Pelanggaran - Guru</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- DataTables Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    
     <style>
         body { min-height: 100vh; background-color: #f8f9fa; }
-        .sidebar { width: 250px; min-height: 100vh; background-color: #343a40; color: #fff; position: fixed; z-index: 100; }
-        .sidebar .brand { padding: 1.5rem 1rem; font-size: 1.25rem; font-weight: bold; border-bottom: 1px solid #4f5962; }
-        .sidebar a { color: #c2c7d0; text-decoration: none; padding: 12px 20px; display: block; }
-        .sidebar a:hover, .sidebar a.active { background-color: #0d6efd; color: #fff; }
-        .content { margin-left: 250px; padding: 30px; }
+        /* Sidebar agar tetap diam di samping layar tanpa scroll internal */
+        .sidebar-sticky {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            background-color: #343a40;
+            color: #fff;
+            width: 250px;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+        .sidebar-sticky .brand {
+            padding: 1.5rem 1rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-bottom: 1px solid #4f5962;
+        }
+        .sidebar-sticky .nav-link {
+            color: #c2c7d0;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+            border-radius: 0.375rem;
+            margin-bottom: 0.2rem;
+        }
+        .sidebar-sticky .nav-link:hover, .sidebar-sticky .nav-link.active {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 30px;
+        }
     </style>
 </head>
 <body>
-    <div class="sidebar">
+
+<div class="d-flex">
+    <!-- SIDEBAR -->
+    <div class="sidebar-sticky p-0">
         <div class="brand">Pelanggaran Siswa</div>
-        <div class="nav flex-column mt-2">
-            <a href="dashboard_guru.php">Dashboard</a>
-            <a href="catat_pelanggaran.php">Catat Pelanggaran</a>
-            <a href="tindakan.php">Tindakan</a>
-            <a href="riwayat.php" class="active">Riwayat</a>
-            <a href="rekap_poin.php">Rekap Poin</a>
-            <hr class="dropdown-divider my-3 border-secondary">
-            <a href="logout.php" class="text-danger">Logout</a>
+        <div class="nav flex-column p-3">
+            <a href="dashboard_guru.php" class="nav-link">Dashboard</a>
+            <a href="catat_pelanggaran.php" class="nav-link">Catat Pelanggaran</a>
+            <a href="tindakan.php" class="nav-link">Tindakan</a>
+            <a href="riwayat.php" class="nav-link btn btn-primary text-white text-start active">Riwayat</a>
+            <a href="rekap_poin.php" class="nav-link">Rekap Poin</a>
+            <hr class="text-secondary my-3">
+            <a href="logout.php" class="nav-link text-danger">Logout</a>
         </div>
     </div>
 
+    <!-- KONTEN UTAMA -->
     <div class="content">
         <h2>Riwayat Pelanggaran Siswa</h2>
         <p class="text-muted">Catatan historis seluruh pelanggaran yang pernah diinput.</p>
 
-        <div class="card p-3 shadow-sm border-0">
+        <div class="card p-4 shadow-sm border-0">
             <div class="table-responsive">
-                <!-- Ditambahkan id="tabelRiwayat" untuk mengaktifkan DataTables -->
-                <table id="tabelRiwayat" class="table table-hover align-middle mb-0" style="width:100%">
+                <table id="tabelRiwayat" class="table table-bordered table-striped align-middle mb-0" style="width:100%">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 130px;">Tanggal</th>
+                            <th style="width: 50px;">#</th>
+                            <th>Tanggal</th>
                             <th>Nama Siswa</th>
                             <th>Pelanggaran</th>
                             <th style="width: 80px;" class="text-center">Poin</th>
-                            <th style="width: 150px;">Dicatat Oleh</th>
+                            <th>Status Tindakan</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php
-                        $query = "SELECT * FROM t_pelanggaran ORDER BY id DESC";
-                        $result = mysqli_query($koneksi, $query);
-
-                        if ($result && mysqli_num_rows($result) > 0) {
-                            $index = 0;
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                
-                                // Deteksi ID/NIS siswa dari t_pelanggaran (disamakan dengan tindakan.php)
-                                $id_s = $row['id_t_siswa'] ?? $row['id_siswa'] ?? $row['siswa_id'] ?? $row['nis'] ?? 0;
-                                $nama_siswa = "";
-
-                                // 1. Cari via ID / NIS jika cocok
-                                if (!empty($id_s)) {
-                                    $q_siswa = mysqli_query($koneksi, "SELECT * FROM t_siswa WHERE id = '$id_s' OR nis = '$id_s'");
-                                    if ($q_siswa && $d_siswa = mysqli_fetch_assoc($q_siswa)) {
-                                        $nama_siswa = $d_siswa['nama'] ?? $d_siswa['nama_siswa'] ?? $d_siswa['nama_lengkap'] ?? '';
-                                    }
-                                }
-
-                                // 2. Fallback Otomatis: Ambil nama dari array $data_siswa jika relasi database kosong/tidak cocok
-                                if (empty($nama_siswa)) {
-                                    if (isset($data_siswa[$index])) {
-                                        $s_item = $data_siswa[$index];
-                                        $nama_siswa = $s_item['nama'] ?? $s_item['nama_siswa'] ?? $s_item['nama_lengkap'] ?? 'Siswa Tidak Ditemukan';
-                                    } else {
-                                        $nama_siswa = 'Siswa Tidak Ditemukan';
-                                    }
-                                }
-
+                        <?php 
+                        if ($query_riwayat && mysqli_num_rows($query_riwayat) > 0) {
+                            $no = 1;
+                            while ($row = mysqli_fetch_assoc($query_riwayat)) {
+                                $nama_s = $row['nama_siswa'] ?? 'Siswa Tidak Ditemukan';
+                                $pelanggaran = $row['pelanggaran'] ?? '-';
+                                $poin = $row['poin'] ?? 0;
                                 $tanggal = $row['tanggal'] ?? date('Y-m-d');
-                                $pelanggaran = $row['pelanggaran'] ?? $row['nama_pelanggaran'] ?? $row['keterangan'] ?? '-';
-                                $poin = $row['poin'] ?? $row['jml_poin'] ?? 0;
-                                $pencatat = $_SESSION['name'] ?? 'Guru';
-                                ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($tanggal); ?></td>
-                                    <td><b><?php echo htmlspecialchars($nama_siswa); ?></b></td>
-                                    <td><?php echo htmlspecialchars($pelanggaran); ?></td>
-                                    <td class="text-center"><span class="badge bg-danger"><?php echo htmlspecialchars($poin); ?></span></td>
-                                    <td><?php echo htmlspecialchars($pencatat); ?></td>
-                                </tr>
-                                <?php
-                                $index++;
+                                $status = $row['status_tindakan'] ?? 'Perlu Tindakan';
+
+                                // Warna badge status
+                                $badge_bg = 'bg-warning text-dark';
+                                if ($status === 'Sudah Ditindak' || $status === 'Selesai') {
+                                    $badge_bg = 'bg-success';
+                                } elseif ($status === 'Diproses') {
+                                    $badge_bg = 'bg-info text-dark';
+                                }
+                        ?>
+                        <tr>
+                            <td><?= $no++; ?></td>
+                            <td><?= htmlspecialchars($tanggal); ?></td>
+                            <td><b><?= htmlspecialchars($nama_s); ?></b></td>
+                            <td><?= htmlspecialchars($pelanggaran); ?></td>
+                            <td class="text-center"><span class="badge bg-danger"><?= htmlspecialchars($poin); ?></span></td>
+                            <td><span class="badge <?= $badge_bg; ?>"><?= htmlspecialchars($status); ?></span></td>
+                        </tr>
+                        <?php 
                             }
-                        } else {
-                            echo "<tr><td colspan='5' class='text-center text-muted py-3'>Belum ada riwayat pelanggaran.</td></tr>";
                         }
                         ?>
                     </tbody>
@@ -121,28 +136,31 @@ if ($q_all_siswa) {
             </div>
         </div>
     </div>
+</div>
 
-    <!-- jQuery & Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<!-- jQuery & Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            $('#tabelRiwayat').DataTable({
-                "language": {
-                    "lengthMenu": "Tampilkan _MENU_ data per halaman",
-                    "zeroRecords": "Data riwayat tidak ditemukan",
-                    "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
-                    "infoEmpty": "Tidak ada data",
-                    "search": "Cari Riwayat:",
-                    "paginate": { "next": "Selanjutnya", "previous": "Sebelumnya" }
-                },
-                "pageLength": 10
-            });
+<script>
+    $(document).ready(function() {
+        $('#tabelRiwayat').DataTable({
+            "language": {
+                "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data riwayat tidak ditemukan",
+                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                "infoEmpty": "Tidak ada data",
+                "search": "Cari Riwayat:",
+                "paginate": { "next": "Selanjutnya", "previous": "Sebelumnya" }
+            },
+            "pageLength": 10,
+            "order": [[1, "desc"]]
         });
-    </script>
+    });
+</script>
+
 </body>
 </html>
