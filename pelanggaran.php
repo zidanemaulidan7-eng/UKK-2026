@@ -39,12 +39,21 @@ $query_kategori = mysqli_query($koneksi,$sql_kategori);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
     <style>
-        /* CSS agar sidebar tetap diam saat halaman di-scroll */
+        /* Sidebar agar tetap diam di samping layar tanpa scrollbar internal */
         .sidebar-sticky {
             position: sticky;
             top: 0;
             height: 100vh;
             overflow-y: auto;
+        }
+        /* Memperkecil padding link sidebar agar muat sempurna */
+        .sidebar-sticky .nav-link {
+            padding-top: 0.35rem !important;
+            padding-bottom: 0.35rem !important;
+            font-size: 0.95rem;
+        }
+        .sidebar-sticky .nav-item {
+            margin-bottom: 0.15rem !important;
         }
     </style>
 </head>
@@ -53,44 +62,47 @@ $query_kategori = mysqli_query($koneksi,$sql_kategori);
 <div class="container-fluid">
     <div class="row">
         <!-- SIDEBAR -->
-        <div class="col-md-3 col-lg-2 bg-dark sidebar-sticky p-3">
-            <h4 class="text-white mb-4">
+        <div class="col-md-3 col-lg-2 bg-dark p-3 sidebar-sticky">
+            <h4 class="text-white mb-3 fs-5">
                 Pelanggaran Siswa
             </h4>
             <ul class="nav nav-pills flex-column">
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
                 </li>
-                
-                <li class="nav-item mb-2">
+                <li class="nav-item">
+                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
+                </li>
+                <li class="nav-item">
                     <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="pelanggaran.php" class="nav-link active">Laporan</a>
+                <li class="nav-item">
+                    <!-- Menu Kelola/Laporan Pelanggaran aktif (Tombol Biru) -->
+                    <a href="pelanggaran.php" class="nav-link btn btn-primary text-white text-start">Laporan</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
                 </li>
-                <hr class="text-secondary">
-                <li class="nav-item mb-2">
+                <hr class="text-secondary my-2">
+                <li class="nav-item">
                     <a href="logout.php" class="nav-link text-danger">Logout</a>
                 </li>
             </ul>
@@ -208,7 +220,7 @@ $query_kategori = mysqli_query($koneksi,$sql_kategori);
                                 <td><?php echo htmlspecialchars($pelanggaran['deskripsi']); ?></td>
                                 <td>
                                     <?php 
-                                    if (isset($pelanggaran['status_aktif']) &&$pelanggaran['status_aktif'] == 1) {
+                                    if (isset($pelanggaran['status_aktif']) && $pelanggaran['status_aktif'] == 1) {
                                         echo '<span class="badge bg-success">Aktif</span>';
                                     } else {
                                         echo '<span class="badge bg-danger">Tidak Aktif</span>';
@@ -245,7 +257,8 @@ $query_kategori = mysqli_query($koneksi,$sql_kategori);
 
 <!-- INISIALISASI DATATABLE -->
 <script>
-    $(document).ready(function() {$('#tabelPelanggaran').DataTable({
+    $(document).ready(function() {
+        $('#tabelPelanggaran').DataTable({
             "pagingType": "simple_numbers",
             "language": {
                 "lengthMenu": "Tampilkan _MENU_ data per halaman",
@@ -259,3 +272,11 @@ $query_kategori = mysqli_query($koneksi,$sql_kategori);
                     "previous": "Sebelumnya"
                 }
             },
+            "pageLength": 10,
+            "order": [[0, "asc"]]
+        });
+    });
+</script>
+
+</body>
+</html>

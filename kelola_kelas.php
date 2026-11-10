@@ -8,6 +8,24 @@ if ($_SESSION['role'] !== 'admin') {
     die("Akses ditolak!");
 }
 
+// Proses Tambah Kelas jika form disubmit
+if (isset($_POST['tambah_kelas'])) {
+    $nama    = mysqli_real_escape_string($koneksi, $_POST['nama']);
+    $tingkat = mysqli_real_escape_string($koneksi, $_POST['tingkat']);
+    $jurusan = mysqli_real_escape_string($koneksi, $_POST['jurusan']);
+    $status  = isset($_POST['status_aktif']) ? $_POST['status_aktif'] : 1;
+
+    $query_tambah = mysqli_query($koneksi, "INSERT INTO t_kelas (nama, tingkat, jurusan, status_aktif) VALUES ('$nama', '$tingkat', '$jurusan', '$status')");
+
+    if ($query_tambah) {
+        $_SESSION['pesan'] = "Data kelas berhasil ditambahkan!";
+        header("Location: kelola_kelas.php");
+        exit;
+    } else {
+        $error = "Gagal menambah kelas: " . mysqli_error($koneksi);
+    }
+}
+
 // Ambil semua data kelas (DIURUTKAN ASCENDING: 1, 2, 3...)
 $query = mysqli_query($koneksi, "
     SELECT * FROM t_kelas
@@ -33,16 +51,21 @@ if (!$query) {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     
     <style>
-        /* Mengatur agar sidebar tetap diam di samping dan rapi */
+        /* Sidebar agar tetap diam di samping layar */
         .sidebar-sticky {
             position: sticky;
             top: 0;
             height: 100vh;
             overflow-y: auto;
         }
-        /* Memperkecil sedikit jarak antar menu agar muat tanpa scroll internal */
+        /* Memperkecil padding link sidebar agar muat sempurna tanpa scroll internal */
+        .sidebar-sticky .nav-link {
+            padding-top: 0.35rem !important;
+            padding-bottom: 0.35rem !important;
+            font-size: 0.95rem;
+        }
         .sidebar-sticky .nav-item {
-            margin-bottom: 0.25rem !important;
+            margin-bottom: 0.15rem !important;
         }
     </style>
 </head>
@@ -57,41 +80,42 @@ if (!$query) {
             </h4>
             <ul class="nav nav-pills flex-column">
                 <li class="nav-item">
-                    <a href="dashboard.php" class="nav-link text-white py-2">Dashboard</a>
+                    <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a href="kelola_siswa.php" class="nav-link text-white py-2">Kelola Siswa</a>
+                    <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
                 </li>
                 <li class="nav-item">
-                    <a href="kelola_guru.php" class="nav-link text-white py-2">Kelola Guru</a>
+                    <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
                 </li>
                 <li class="nav-item">
-                    <a href="kelola_kelas.php" class="nav-link active bg-primary text-white py-2">Kelola Kelas</a>
+                    <!-- Menu Kelola Kelas aktif (Tombol Biru) -->
+                    <a href="kelola_kelas.php" class="nav-link btn btn-primary text-white text-start">Kelola Kelas</a>
                 </li>
                 <li class="nav-item">
-                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white py-2">Kelola Tahun Ajaran</a>
+                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
                 </li>
                 <li class="nav-item">
-                    <a href="kelola_wali_kelas.php" class="nav-link text-white py-2">Kelola Wali Kelas</a>
+                    <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
                 </li>
                 <li class="nav-item">
-                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white py-2">Kelola Kategori Pelanggaran</a>
+                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
                 </li>
                 <li class="nav-item">
-                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white py-2">Kelola Jenis Pelanggaran</a>
+                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
                 </li>
                 <li class="nav-item">
-                    <a href="penempatan_siswa.php" class="nav-link text-white py-2">Penempatan Siswa</a>
+                    <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
                 </li>
                 <li class="nav-item">
-                    <a href="pelanggaran.php" class="nav-link text-white py-2">Laporan</a>
+                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
                 </li>
                 <li class="nav-item">
-                    <a href="tentang_saya.php" class="nav-link text-white py-2">About Me</a>
+                    <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
                 </li>
                 <hr class="text-secondary my-2">
                 <li class="nav-item">
-                    <a href="logout.php" class="nav-link text-danger py-2">Logout</a>
+                    <a href="logout.php" class="nav-link text-danger">Logout</a>
                 </li>
             </ul>
         </div>
@@ -101,10 +125,6 @@ if (!$query) {
             <h2>Kelola Kelas</h2>
             <p>Halaman untuk mengelola data kelas.</p>
 
-            <div class="mb-3">
-                <a href="tambah_kelas.php" class="btn btn-primary btn-sm">+ Tambah Kelas</a>
-            </div>
-
             <?php if (isset($_SESSION['pesan'])) { ?>
                 <div class="alert alert-success mt-3">
                     <?php
@@ -113,6 +133,55 @@ if (!$query) {
                     ?>
                 </div>
             <?php } ?>
+
+            <?php if (isset($error)) { ?>
+                <div class="alert alert-danger mt-3">
+                    <?= $error; ?>
+                </div>
+            <?php } ?>
+
+            <!-- FORM TAMBAH KELAS -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Tambah Data Kelas</h5>
+                </div>
+                <div class="card-body">
+                    <form action="" method="POST">
+                        <div class="mb-3 row">
+                            <label for="nama" class="col-sm-2 col-form-label">Nama Kelas</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="nama" name="nama" placeholder="Contoh: X IPA 1" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="tingkat" class="col-sm-2 col-form-label">Tingkat</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="tingkat" name="tingkat" placeholder="Contoh: X, XI, XII" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="jurusan" class="col-sm-2 col-form-label">Jurusan</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="jurusan" name="jurusan" placeholder="Contoh: IPA / IPS / TKJ" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="status_aktif" class="col-sm-2 col-form-label">Status Aktif</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="status_aktif" name="status_aktif">
+                                    <option value="1">Aktif</option>
+                                    <option value="0">Tidak Aktif</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-10 offset-sm-2">
+                                <button type="submit" name="tambah_kelas" class="btn btn-primary">Tambah Kelas</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
             <hr class="my-4">
 
@@ -133,10 +202,11 @@ if (!$query) {
                     <tbody>
                         <?php
                         if ($query && mysqli_num_rows($query) > 0) {
+                            $no = 1;
                             while ($kelas = mysqli_fetch_assoc($query)) {
                         ?>
                             <tr>
-                                <td><?= htmlspecialchars($kelas['id']); ?></td>
+                                <td><?= $no++; ?></td>
                                 <td><?= htmlspecialchars($kelas['nama']); ?></td>
                                 <td><?= htmlspecialchars($kelas['tingkat']); ?></td>
                                 <td><?= htmlspecialchars($kelas['jurusan']); ?></td>

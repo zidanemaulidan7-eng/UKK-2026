@@ -25,34 +25,35 @@ if ($_SESSION['role'] !== 'admin') {
             margin: 0;
             background-color: #f8f9fa;
         }
-        /* Style Sidebar agar konsisten */
-        .sidebar {
-            min-height: 100vh;
+        /* Style Sidebar agar konsisten dan sticky tanpa scroll internal */
+        .sidebar-sticky {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
             background-color: #212529;
             color: #fff;
-            width: 260px;
             flex-shrink: 0;
         }
-        .sidebar h3 {
-            font-size: 1.25rem;
-            padding: 1rem;
-            color: #fff;
-            border-bottom: 1px solid #373b3e;
-        }
-        .sidebar .nav-link {
+        /* Memperkecil padding link sidebar agar muat sempurna */
+        .sidebar-sticky .nav-link {
             color: #adb5bd;
-            padding: 0.75rem 1rem;
-            margin-bottom: 0.2rem;
+            padding-top: 0.35rem !important;
+            padding-bottom: 0.35rem !important;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            margin-bottom: 0.15rem !important;
+            font-size: 0.95rem;
             border-radius: 0.375rem;
         }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+        .sidebar-sticky .nav-link:hover {
             color: #fff;
-            background-color: #0d6efd;
+            background-color: rgba(255, 255, 255, 0.1);
         }
-        .sidebar .nav-link.logout {
+        .sidebar-sticky .nav-link.logout {
             color: #dc3545;
         }
-        .sidebar .nav-link.logout:hover {
+        .sidebar-sticky .nav-link.logout:hover {
             background-color: #dc3545;
             color: #fff;
         }
@@ -74,30 +75,53 @@ if ($_SESSION['role'] !== 'admin') {
 
 <div class="d-flex">
     <!-- SIDEBAR -->
-    <nav class="sidebar px-3 py-4 d-flex flex-column justify-content-between">
+    <div class="col-md-3 col-lg-2 bg-dark p-3 sidebar-sticky d-flex flex-column justify-content-between">
         <div>
-            <h3 class="mb-3">Pelanggaran Siswa</h3>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link" href="dashboard.php">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="kelola_siswa.php">Kelola Siswa</a></li>
-                <li class="nav-item"><a class="nav-link" href="kelola_guru.php">Kelola Guru</a></li>
-                <li class="nav-item"><a class="nav-link" href="kelola_kelas.php">Kelola Kelas</a></li>
-                <li class="nav-item"><a class="nav-link" href="kelola_tahun_ajaran.php">Kelola Tahun Ajaran</a></li>
-                <li class="nav-item"><a class="nav-link" href="kelola_wali_kelas.php">Kelola Wali Kelas</a></li>
-                <li class="nav-item"><a class="nav-link" href="kelola_kategori_pelanggaran.php">Kelola Kategori Pelanggaran</a></li>
-                <li class="nav-item"><a class="nav-link" href="pelanggaran.php">Kelola Jenis Pelanggaran</a></li>
-                <li class="nav-item"><a class="nav-link" href="penempatan_siswa.php">Penempatan Siswa</a></li>
-                <li class="nav-item"><a class="nav-link" href="pelanggaran.php">Laporan</a></li>
-                <li class="nav-item"><a class="nav-link active" href="tentang_saya.php">About Me</a></li>
+            <h4 class="text-white mb-3 fs-5">
+                Pelanggaran Siswa
+            </h4>
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item">
+                    <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
+                </li>
+                <li class="nav-item">
+                    <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
+                </li>
+                <li class="nav-item">
+                    <a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a>
+                </li>
+                <li class="nav-item">
+                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
+                </li>
+                <li class="nav-item">
+                    <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
+                </li>
+                <li class="nav-item">
+                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
+                </li>
+                <li class="nav-item">
+                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
+                </li>
+                <li class="nav-item">
+                    <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
+                </li>
+                <li class="nav-item">
+                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
+                </li>
+                <li class="nav-item">
+                    <!-- Menu About Me aktif (Tombol Biru) -->
+                    <a href="tentang_saya.php" class="nav-link btn btn-primary text-white text-start">About Me</a>
+                </li>
+                <hr class="text-secondary my-2">
+                <li class="nav-item">
+                    <a href="logout.php" class="nav-link logout">Logout</a>
+                </li>
             </ul>
         </div>
-        <div>
-            <hr class="text-secondary">
-            <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link logout" href="logout.php">Logout</a></li>
-            </ul>
-        </div>
-    </nav>
+    </div>
 
     <!-- KONTEN UTAMA PENUH DI LAYAR -->
     <div class="main-content">
