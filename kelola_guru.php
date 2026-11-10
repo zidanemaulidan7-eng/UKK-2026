@@ -37,7 +37,10 @@ if (!$query) {
     
     <style>
         .sidebar {
-            min-height: 100vh;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
             background-color: #212529;
             color: #fff;
         }

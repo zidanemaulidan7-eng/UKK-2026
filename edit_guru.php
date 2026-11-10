@@ -130,7 +130,7 @@ if (!$guru) {
                                     </div>
 
                                     <div class="mb-3 row">
-                                        <label class="col-sm-3 col-form-label fw-semibold">Password Baru</label>
+                                        <label class="col-sm-3 col-form-label fw-semibold">Password</label>
                                         <div class="col-sm-9">
                                             <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
                                             <div class="form-text text-muted">Biarkan kosong jika password tidak ingin diganti.</div>
