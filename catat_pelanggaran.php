@@ -7,14 +7,31 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'guru') {
     exit;
 }
 
+// Ambil tahun ajaran yang sedang aktif dari database (asumsi ada tabel t_tahun_ajaran dengan kolom status_aktif / status = 1)
+// Sesuaikan nama kolom tabel jika berbeda di database Anda
+$q_ta = mysqli_query($koneksi, "SELECT * FROM t_tahun_ajaran WHERE status_aktif = 1 OR status = 1 LIMIT 1");
+$d_ta = mysqli_fetch_assoc($q_ta);
+$tahun_ajaran_id = $d_ta['id'] ?? '';
+$nama_tahun_ajaran = $d_ta['nama'] ?? '2026/2027'; // Default jika belum diatur
+
 // Proses simpan data pelanggaran jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $siswa_id    = $_POST['siswa_id'] ?? '';
-    $pelanggaran = $_POST['pelanggaran'] ?? '';
-    $poin        = $_POST['poin'] ?? 0;
-    $tanggal     = $_POST['tanggal'] ?? date('Y-m-d');
+    $siswa_id       = $_POST['siswa_id'] ?? '';
+    $pelanggaran_id = $_POST['pelanggaran_id'] ?? '';
+    $tanggal        = $_POST['tanggal'] ?? date('Y-m-d');
+    
+    // Jika tabel t_pelanggaran Anda memiliki kolom tahun_ajaran_id / tahun_ajaran, sertakan di sini.
+    // (Sesuaikan dengan struktur kolom database Anda jika ada kolom tambahan)
 
-    // Query INSERT untuk menyimpan data
+    // Ambil nama pelanggaran dan poin berdasarkan ID jenis pelanggaran yang dipilih
+    $q_detail = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran WHERE id = '$pelanggaran_id'");
+    $d_detail = mysqli_fetch_assoc($q_detail);
+
+    $pelanggaran = $d_detail['nama'] ?? '';
+    $poin        = $d_detail['poin'] ?? 0;
+
+    // Query INSERT (Sesuaikan jika kolom tahun ajaran perlu disimpan ke database)
+    // Contoh jika tabel menyimpan tahun_ajaran: INSERT INTO t_pelanggaran (id_t_siswa, pelanggaran, poin, tanggal, tahun_ajaran) VALUES (...)
     $sql = "INSERT INTO t_pelanggaran (id_t_siswa, pelanggaran, poin, tanggal) VALUES (?, ?, ?, ?)";
     
     $stmt = mysqli_prepare($koneksi, $sql);
@@ -42,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Catat Pelanggaran - Guru</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Select2 CSS untuk kotak pilihan siswa yang bisa diketik/dicari -->
+    <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     
@@ -75,6 +92,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="card p-4 shadow-sm border-0 col-md-8">
             <form action="" method="POST">
+                <!-- Informasi Tahun Ajaran Aktif (Otomatis & Tidak Perlu Diketik) -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-primary">Tahun Ajaran Aktif</label>
+                    <input type="text" class="form-control bg-light fw-bold" value="<?php echo htmlspecialchars($nama_tahun_ajaran); ?>" readonly>
+                    <!-- Input hidden untuk dikirim ke proses PHP jika dibutuhkan -->
+                    <input type="hidden" name="tahun_ajaran_id" value="<?php echo htmlspecialchars($tahun_ajaran_id); ?>">
+                </div>
+
+                <!-- Dropdown Pilih Siswa -->
                 <div class="mb-3">
                     <label class="form-label">Cari / Pilih Siswa (Ketik Nama)</label>
                     <select name="siswa_id" id="selectSiswa" class="form-select" required>
@@ -83,26 +109,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $query_siswa = mysqli_query($koneksi, "SELECT * FROM t_siswa ORDER BY nama ASC");
                         if ($query_siswa && mysqli_num_rows($query_siswa) > 0) {
                             while ($siswa = mysqli_fetch_assoc($query_siswa)) {
-                                echo "<option value='" . $siswa['id'] . "'>" . htmlspecialchars($siswa['nama']) . " (ID: " . htmlspecialchars($siswa['id']) . ")</option>";
+                                echo "<option value='" . $siswa['id'] . "'>" . htmlspecialchars($siswa['nama']) . " (NIS: " . htmlspecialchars($siswa['nis'] ?? '-') . ")</option>";
                             }
-                        } else {
-                            echo "<option value='' disabled>Belum ada data siswa di database</option>";
                         }
                         ?>
                     </select>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Tanggal Pelanggaran</label>
                     <input type="date" name="tanggal" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
                 </div>
+
+                <!-- Dropdown Jenis Pelanggaran (Unik / Tanpa Spam Duplikat) -->
                 <div class="mb-3">
-                    <label class="form-label">Jenis Pelanggaran (Ketik Bebas)</label>
-                    <textarea name="pelanggaran" class="form-control" rows="3" placeholder="Contoh: Tidur di kelas / Terlambat..." required></textarea>
+                    <label class="form-label">Jenis Pelanggaran</label>
+                    <select name="pelanggaran_id" id="selectJenisPelanggaran" class="form-select" required>
+                        <option value="">-- Pilih Jenis Pelanggaran --</option>
+                        <?php
+                        $query_jp = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran GROUP BY nama ORDER BY nama ASC");
+                        if ($query_jp && mysqli_num_rows($query_jp) > 0) {
+                            while ($jp = mysqli_fetch_assoc($query_jp)) {
+                                echo "<option value='" . $jp['id'] . "'>" . htmlspecialchars($jp['nama']) . " (Poin: " . $jp['poin'] . ")</option>";
+                            }
+                        }
+                        ?>
+                    </select>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Poin Pelanggaran</label>
-                    <input type="number" name="poin" class="form-control" placeholder="Contoh: 10" required>
-                </div>
+
                 <button type="submit" class="btn btn-primary">Simpan Pelanggaran</button>
                 <a href="dashboard_guru.php" class="btn btn-secondary">Batal</a>
             </form>
@@ -117,6 +151,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $('#selectSiswa').select2({
                 theme: 'bootstrap-5',
                 placeholder: '-- Ketik atau Pilih Nama Siswa --',
+                allowClear: true
+            });
+
+            $('#selectJenisPelanggaran').select2({
+                theme: 'bootstrap-5',
+                placeholder: '-- Pilih Jenis Pelanggaran --',
                 allowClear: true
             });
         });
