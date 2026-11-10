@@ -12,7 +12,7 @@ $sql = "SELECT
         ON t_pelanggaran.pelanggaran_kategori_id = t_pelanggaran_kategori.id
         ORDER BY t_pelanggaran.id ASC";
 
-$query = mysqli_query($koneksi, $sql);
+$query = mysqli_query($koneksi,$sql);
 
 if (!$query) {
     die("<div class='alert alert-danger m-4'><strong>DATABASE ERROR [DB_ERR_PELANGGARAN]:</strong> Gagal mengambil data pelanggaran: " . mysqli_error($koneksi) . "</div>");
@@ -22,7 +22,7 @@ if (!$query) {
 $sql_kategori = "SELECT * FROM t_pelanggaran_kategori
                  ORDER BY nama ASC";
 
-$query_kategori = mysqli_query($koneksi, $sql_kategori);
+$query_kategori = mysqli_query($koneksi,$sql_kategori);
 ?>
 
 <!DOCTYPE html>
@@ -37,13 +37,23 @@ $query_kategori = mysqli_query($koneksi, $sql_kategori);
     
     <!-- DataTables Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+    <style>
+        /* CSS agar sidebar tetap diam saat halaman di-scroll */
+        .sidebar-sticky {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container-fluid">
     <div class="row">
         <!-- SIDEBAR -->
-        <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
+        <div class="col-md-3 col-lg-2 bg-dark sidebar-sticky p-3">
             <h4 class="text-white mb-4">
                 Pelanggaran Siswa
             </h4>
@@ -198,7 +208,7 @@ $query_kategori = mysqli_query($koneksi, $sql_kategori);
                                 <td><?php echo htmlspecialchars($pelanggaran['deskripsi']); ?></td>
                                 <td>
                                     <?php 
-                                    if (isset($pelanggaran['status_aktif']) && $pelanggaran['status_aktif'] == 1) {
+                                    if (isset($pelanggaran['status_aktif']) &&$pelanggaran['status_aktif'] == 1) {
                                         echo '<span class="badge bg-success">Aktif</span>';
                                     } else {
                                         echo '<span class="badge bg-danger">Tidak Aktif</span>';
@@ -235,8 +245,7 @@ $query_kategori = mysqli_query($koneksi, $sql_kategori);
 
 <!-- INISIALISASI DATATABLE -->
 <script>
-    $(document).ready(function() {
-        $('#tabelPelanggaran').DataTable({
+    $(document).ready(function() {$('#tabelPelanggaran').DataTable({
             "pagingType": "simple_numbers",
             "language": {
                 "lengthMenu": "Tampilkan _MENU_ data per halaman",
@@ -250,11 +259,3 @@ $query_kategori = mysqli_query($koneksi, $sql_kategori);
                     "previous": "Sebelumnya"
                 }
             },
-            "pageLength": 10,
-            "order": [[0, "asc"]]
-        });
-    });
-</script>
-
-</body>
-</html>
