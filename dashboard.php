@@ -54,16 +54,36 @@ $jumlah_pelanggaran = hitung_total($koneksi, ['t_pelanggaran', 'pelanggaran']);
         .sidebar-fixed h4 {
             font-size: 1.1rem;
             margin-bottom: 0.8rem !important;
+            color: #fff;
+            border-bottom: 1px solid #373b3e;
+            padding-bottom: 0.5rem;
         }
         .sidebar-fixed .nav-item {
             margin-bottom: 2px !important;
         }
         .sidebar-fixed .nav-link {
+            color: #fff !important; /* Teks menu warna putih */
             padding: 6px 10px;
             font-size: 0.88rem;
+            border-radius: 0.375rem;
+        }
+        .sidebar-fixed .nav-link:hover {
+            background-color: #343a40;
+        }
+        .sidebar-fixed .nav-link.active {
+            background-color: #0d6efd !important;
+            color: #fff !important;
+        }
+        .sidebar-fixed .nav-link.logout {
+            color: #dc3545 !important;
+        }
+        .sidebar-fixed .nav-link.logout:hover {
+            background-color: #dc3545 !important;
+            color: #fff !important;
         }
         .sidebar-fixed hr {
             margin: 0.5rem 0;
+            border-color: #373b3e;
         }
 
         /* Memberikan jarak margin kiri pada konten utama agar tidak tertutup sidebar */
@@ -99,52 +119,36 @@ $jumlah_pelanggaran = hitung_total($koneksi, ['t_pelanggaran', 'pelanggaran']);
     </style>
 </head>
 
-<body>
+<body class="bg-light">
 
 <div class="container-fluid">
     <div class="row">
         <!-- SIDEBAR -->
         <div class="sidebar-fixed">
-            <h4 class="text-white">
-                Pelanggaran Siswa
-            </h4>
+            <h4 class="mb-3">Pelanggaran Siswa</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a href="dashboard.php" class="nav-link active">Dashboard</a></li>
+                <li class="nav-item"><a href="kelola_siswa.php" class="nav-link">Kelola Siswa</a></li>
+                <li class="nav-item"><a href="kelola_guru.php" class="nav-link">Kelola Guru</a></li>
+                <li class="nav-item"><a href="kelola_kelas.php" class="nav-link">Kelola Kelas</a></li>
+                <li class="nav-item"><a href="kelola_tahun_ajaran.php" class="nav-link">Kelola Tahun Ajaran</a></li>
+                <li class="nav-item"><a href="kelola_wali_kelas.php" class="nav-link">Kelola Wali Kelas</a></li>
+                <li class="nav-item"><a href="kelola_kategori_pelanggaran.php" class="nav-link">Kelola Kategori Pelanggaran</a></li>
+                <li class="nav-item"><a href="kelola_jenis_pelanggaran.php" class="nav-link">Kelola Jenis Pelanggaran</a></li>
+                <li class="nav-item"><a href="penempatan_siswa.php" class="nav-link">Penempatan Siswa</a></li>
+                <li class="nav-item"><a href="pelanggaran.php" class="nav-link">Laporan</a></li>
+                <li class="nav-item"><a href="tentang_saya.php" class="nav-link">About Me</a></li>
+            </ul>
+            <hr>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a href="logout.php" class="nav-link logout">Logout</a></li>
+            </ul>
+        </div>
+            </ul>
+            <hr>
             <ul class="nav nav-pills flex-column">
                 <li class="nav-item">
-                    <a href="dashboard.php" class="nav-link active">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
-                </li>
-                <li class="nav-item">
-                    <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
-                </li>
-                <li class="nav-item">
-                    <a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a>
-                </li>
-                <li class="nav-item">
-                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
-                </li>
-                <li class="nav-item">
-                    <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
-                </li>
-                <li class="nav-item">
-                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
-                </li>
-                <li class="nav-item">
-                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
-                </li>
-                <li class="nav-item">
-                    <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
-                </li>
-                <li class="nav-item">
-                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
-                </li>
-                <li class="nav-item">
-                    <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
-                </li>
-                <hr class="text-secondary">
-                <li class="nav-item">
-                    <a href="logout.php" class="nav-link text-danger">Logout</a>
+                    <a href="logout.php" class="nav-link logout">Logout</a>
                 </li>
             </ul>
         </div>
@@ -198,9 +202,6 @@ $jumlah_pelanggaran = hitung_total($koneksi, ['t_pelanggaran', 'pelanggaran']);
                         </div>
                     </div>
                 </div>
-                    </div>
-                </div>
-                    </div>
             </div>
         </main>
     </div>
