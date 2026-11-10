@@ -140,49 +140,6 @@ if (!$query) {
                 </div>
             <?php } ?>
 
-            <!-- FORM TAMBAH KELAS -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0">Tambah Data Kelas</h5>
-                </div>
-                <div class="card-body">
-                    <form action="" method="POST">
-                        <div class="mb-3 row">
-                            <label for="nama" class="col-sm-2 col-form-label">Nama Kelas</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="nama" name="nama" placeholder="Contoh: X IPA 1" required>
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="tingkat" class="col-sm-2 col-form-label">Tingkat</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="tingkat" name="tingkat" placeholder="Contoh: X, XI, XII" required>
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="jurusan" class="col-sm-2 col-form-label">Jurusan</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="jurusan" name="jurusan" placeholder="Contoh: IPA / IPS / TKJ" required>
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="status_aktif" class="col-sm-2 col-form-label">Status Aktif</label>
-                            <div class="col-sm-10">
-                                <select class="form-control" id="status_aktif" name="status_aktif">
-                                    <option value="1">Aktif</option>
-                                    <option value="0">Tidak Aktif</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-10 offset-sm-2">
-                                <button type="submit" name="tambah_kelas" class="btn btn-primary">Tambah Kelas</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
             <hr class="my-4">
 
             <h4 class="mb-3">Data Kelas</h4>
