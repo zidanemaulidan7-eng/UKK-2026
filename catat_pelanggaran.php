@@ -7,9 +7,8 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'guru') {
     exit;
 }
 
-// Ambil tahun ajaran yang sedang aktif dari database (asumsi ada tabel t_tahun_ajaran dengan kolom status_aktif / status = 1)
-// Sesuaikan nama kolom tabel jika berbeda di database Anda
-$q_ta = mysqli_query($koneksi, "SELECT * FROM t_tahun_ajaran WHERE status_aktif = 1 OR status = 1 LIMIT 1");
+// Ambil tahun ajaran yang sedang aktif dari database (menggunakan status_aktif)
+$q_ta = mysqli_query($koneksi, "SELECT * FROM t_tahun_ajaran WHERE status_aktif = 1 LIMIT 1");
 $d_ta = mysqli_fetch_assoc($q_ta);
 $tahun_ajaran_id = $d_ta['id'] ?? '';
 $nama_tahun_ajaran = $d_ta['nama'] ?? '2026/2027'; // Default jika belum diatur
@@ -19,9 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $siswa_id       = $_POST['siswa_id'] ?? '';
     $pelanggaran_id = $_POST['pelanggaran_id'] ?? '';
     $tanggal        = $_POST['tanggal'] ?? date('Y-m-d');
-    
-    // Jika tabel t_pelanggaran Anda memiliki kolom tahun_ajaran_id / tahun_ajaran, sertakan di sini.
-    // (Sesuaikan dengan struktur kolom database Anda jika ada kolom tambahan)
 
     // Ambil nama pelanggaran dan poin berdasarkan ID jenis pelanggaran yang dipilih
     $q_detail = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran WHERE id = '$pelanggaran_id'");
@@ -30,8 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pelanggaran = $d_detail['nama'] ?? '';
     $poin        = $d_detail['poin'] ?? 0;
 
-    // Query INSERT (Sesuaikan jika kolom tahun ajaran perlu disimpan ke database)
-    // Contoh jika tabel menyimpan tahun_ajaran: INSERT INTO t_pelanggaran (id_t_siswa, pelanggaran, poin, tanggal, tahun_ajaran) VALUES (...)
+    // Query INSERT untuk menyimpan data
     $sql = "INSERT INTO t_pelanggaran (id_t_siswa, pelanggaran, poin, tanggal) VALUES (?, ?, ?, ?)";
     
     $stmt = mysqli_prepare($koneksi, $sql);
@@ -92,11 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="card p-4 shadow-sm border-0 col-md-8">
             <form action="" method="POST">
-                <!-- Informasi Tahun Ajaran Aktif (Otomatis & Tidak Perlu Diketik) -->
+                <!-- Informasi Tahun Ajaran Aktif (Otomatis) -->
                 <div class="mb-3">
                     <label class="form-label fw-bold text-primary">Tahun Ajaran Aktif</label>
                     <input type="text" class="form-control bg-light fw-bold" value="<?php echo htmlspecialchars($nama_tahun_ajaran); ?>" readonly>
-                    <!-- Input hidden untuk dikirim ke proses PHP jika dibutuhkan -->
                     <input type="hidden" name="tahun_ajaran_id" value="<?php echo htmlspecialchars($tahun_ajaran_id); ?>">
                 </div>
 
@@ -121,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="date" name="tanggal" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
                 </div>
 
-                <!-- Dropdown Jenis Pelanggaran (Unik / Tanpa Spam Duplikat) -->
+                <!-- Dropdown Jenis Pelanggaran (GROUP BY nama agar bersih tanpa duplikat) -->
                 <div class="mb-3">
                     <label class="form-label">Jenis Pelanggaran</label>
                     <select name="pelanggaran_id" id="selectJenisPelanggaran" class="form-select" required>
