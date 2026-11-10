@@ -31,53 +31,67 @@ if (!$query) {
     
     <!-- DataTables Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    
+    <style>
+        /* Mengatur agar sidebar tetap diam di samping dan rapi */
+        .sidebar-sticky {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        /* Memperkecil sedikit jarak antar menu agar muat tanpa scroll internal */
+        .sidebar-sticky .nav-item {
+            margin-bottom: 0.25rem !important;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container-fluid">
     <div class="row">
         <!-- SIDEBAR -->
-        <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
-            <h4 class="text-white mb-4">
+        <div class="col-md-3 col-lg-2 bg-dark p-3 sidebar-sticky">
+            <h4 class="text-white mb-3 fs-5">
                 Pelanggaran Siswa
             </h4>
             <ul class="nav nav-pills flex-column">
-                <li class="nav-item mb-2">
-                    <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
+                <li class="nav-item">
+                    <a href="dashboard.php" class="nav-link text-white py-2">Dashboard</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
+                <li class="nav-item">
+                    <a href="kelola_siswa.php" class="nav-link text-white py-2">Kelola Siswa</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
+                <li class="nav-item">
+                    <a href="kelola_guru.php" class="nav-link text-white py-2">Kelola Guru</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_kelas.php" class="nav-link active">Kelola Kelas</a>
+                <li class="nav-item">
+                    <a href="kelola_kelas.php" class="nav-link active bg-primary text-white py-2">Kelola Kelas</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
+                <li class="nav-item">
+                    <a href="kelola_tahun_ajaran.php" class="nav-link text-white py-2">Kelola Tahun Ajaran</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
+                <li class="nav-item">
+                    <a href="kelola_wali_kelas.php" class="nav-link text-white py-2">Kelola Wali Kelas</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
+                <li class="nav-item">
+                    <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white py-2">Kelola Kategori Pelanggaran</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
+                <li class="nav-item">
+                    <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white py-2">Kelola Jenis Pelanggaran</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
+                <li class="nav-item">
+                    <a href="penempatan_siswa.php" class="nav-link text-white py-2">Penempatan Siswa</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
+                <li class="nav-item">
+                    <a href="pelanggaran.php" class="nav-link text-white py-2">Laporan</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
+                <li class="nav-item">
+                    <a href="tentang_saya.php" class="nav-link text-white py-2">About Me</a>
                 </li>
-                <hr class="text-secondary">
-                <li class="nav-item mb-2">
-                    <a href="logout.php" class="nav-link text-danger">Logout</a>
+                <hr class="text-secondary my-2">
+                <li class="nav-item">
+                    <a href="logout.php" class="nav-link text-danger py-2">Logout</a>
                 </li>
             </ul>
         </div>
