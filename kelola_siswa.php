@@ -20,63 +20,125 @@ $query = mysqli_query($koneksi, $sql);
     
     <!-- DataTables Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+    <style>
+        /* Mengunci sidebar agar diam total dan tidak bisa di-scroll */
+        .sidebar-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 16.666667%; /* Lebar standar col-lg-2 */
+            height: 100vh;
+            z-index: 100;
+            overflow: hidden; /* Mencegah pergerakan/scroll pada sidebar */
+            padding: 15px;
+        }
+
+        /* Membuat jarak dan ukuran menu lebih ringkas agar pas di berbagai tinggi layar */
+        .sidebar-fixed h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem !important;
+        }
+        .sidebar-fixed .nav-item {
+            margin-bottom: 2px !important;
+        }
+        .sidebar-fixed .nav-link {
+            padding: 6px 10px;
+            font-size: 0.88rem;
+        }
+        .sidebar-fixed hr {
+            margin: 0.5rem 0;
+        }
+
+        /* Memberikan jarak margin kiri pada konten utama agar tidak tertutup sidebar */
+        .main-content {
+            margin-left: 16.666667%;
+            width: 83.333333%;
+        }
+
+        /* Responsif untuk layar medium / tablet */
+        @media (max-width: 991.98px) {
+            .sidebar-fixed {
+                width: 25%; /* Lebar col-md-3 */
+            }
+            .main-content {
+                margin-left: 25%;
+                width: 75%;
+            }
+        }
+
+        /* Responsif untuk layar kecil / HP */
+        @media (max-width: 767.98px) {
+            .sidebar-fixed {
+                position: relative;
+                width: 100%;
+                height: auto;
+                overflow: visible;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <div class="container-fluid">
     <div class="row">
         <!-- SIDEBAR -->
-        <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
-            <h4 class="text-white mb-4">
+        <div class="col-md-3 col-lg-2 bg-dark sidebar-fixed">
+            <h4 class="text-white">
                 Pelanggaran Siswa
             </h4>
             <ul class="nav nav-pills flex-column">
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_siswa.php" class="nav-link active">Kelola Siswa</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_guru.php" class="nav-link text-white">Kelola Guru</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_kelas.php" class="nav-link text-white">Kelola Kelas</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_tahun_ajaran.php" class="nav-link text-white">Kelola Tahun Ajaran</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_wali_kelas.php" class="nav-link text-white">Kelola Wali Kelas</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_kategori_pelanggaran.php" class="nav-link text-white">Kelola Kategori Pelanggaran</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="kelola_jenis_pelanggaran.php" class="nav-link text-white">Kelola Jenis Pelanggaran</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
                 </li>
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
                 </li>
                 <hr class="text-secondary">
-                <li class="nav-item mb-2">
+                <li class="nav-item">
                     <a href="logout.php" class="nav-link text-danger">Logout</a>
                 </li>
             </ul>
         </div>
 
         <!-- KONTEN UTAMA -->
-        <main class="col-md-9 col-lg-10 p-4">
+        <main class="col-md-9 col-lg-10 p-4 main-content">
             <h2>Kelola Siswa</h2>
             <p>Halaman untuk mengelola data siswa.</p>
 
-            <!-- Tombol Tambah Siswa (Menyerupai Kelola Kelas) -->
+            <!-- Tombol Tambah Siswa -->
             <div class="mb-3">
                 <a href="tambah_siswa.php" class="btn btn-primary btn-sm">+ Tambah Siswa</a>
             </div>
