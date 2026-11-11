@@ -139,6 +139,11 @@ if ($query_siswa) {
                         Rekap Poin
                     </a>
                 </li>
+                <li class="nav-item mb-1">
+                    <a href="rekap_poin.php" class="nav-link">
+                        Laporan
+                    </a>
+                </li>
 
                 <hr class="text-secondary my-3">
 
