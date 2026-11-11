@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 11 Nov 2026 pada 06.16
+-- Waktu pembuatan: 11 Nov 2026 pada 06.28
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -225,7 +225,22 @@ INSERT INTO `t_kategori_pelanggaran` (`id_kategori`, `nama_kategori`, `deskripsi
 (22, 'Merusak Fasilitas Sekolah', '', 15),
 (23, 'Keluar Kelas Tanpa Izin', '', 5),
 (24, 'Tidak Mengikuti Kegiatan Sekolah', '', 5),
-(25, 'Membawa Barang Terlarang', '', 20);
+(25, 'Membawa Barang Terlarang', '', 20),
+(26, 'Terlambat Datang ke Sekolah', NULL, 5),
+(27, 'Tidak Memakai Seragam Sesuai Aturan', NULL, 5),
+(28, 'Tidak Memakai Atribut Sekolah', NULL, 3),
+(29, 'Tidak Mengerjakan Tugas', NULL, 3),
+(30, 'Makan di Kelas', NULL, 1),
+(31, 'Tidur di Kelas', NULL, 10),
+(32, 'Membolos Sekolah', NULL, 10),
+(33, 'Tidak Mengikuti Upacara', NULL, 5),
+(34, 'Berkelahi dengan Teman', NULL, 15),
+(35, 'Merokok di Lingkungan Sekolah', NULL, 20),
+(36, 'Berkata Tidak Sopan', NULL, 5),
+(37, 'Merusak Fasilitas Sekolah', NULL, 15),
+(38, 'Keluar Kelas Tanpa Izin', NULL, 5),
+(39, 'Tidak Mengikuti Kegiatan Sekolah', NULL, 5),
+(40, 'Membawa Barang Terlarang', NULL, 20);
 
 -- --------------------------------------------------------
 
@@ -604,7 +619,9 @@ INSERT INTO `t_pelanggaran` (`id`, `pelanggaran_kategori_id`, `kode`, `nama`, `p
 (102, NULL, NULL, NULL, 1, '', 0, '2026-10-21 05:26:21', '2026-10-21 05:26:21', 39, 'makan di kelas', '2026-10-21', 'Sudah Ditindak'),
 (103, NULL, NULL, NULL, 10, '', 0, '2026-11-10 07:42:04', '2026-11-10 07:42:04', 1, 'tidur di kelas', '2026-11-10', 'Sudah Ditindak'),
 (104, NULL, NULL, NULL, 8, '', 0, '2026-11-11 04:55:25', '2026-11-11 04:55:25', 22, 'Membawa barang terlarang #007', '2026-11-11', 'Sudah Ditindak'),
-(105, NULL, NULL, NULL, 9, '', 0, '2026-11-11 04:56:15', '2026-11-11 04:56:15', 20, 'Berkata tidak sopan #008', '2026-11-11', 'Sudah Ditindak');
+(105, NULL, NULL, NULL, 9, '', 0, '2026-11-11 04:56:15', '2026-11-11 04:56:15', 20, 'Berkata tidak sopan #008', '2026-11-11', 'Sudah Ditindak'),
+(106, NULL, NULL, NULL, 8, '', 0, '2026-11-11 05:18:17', '2026-11-11 05:18:17', 121, 'Membawa barang terlarang #017', '2026-11-11', 'Sudah Ditindak'),
+(107, NULL, NULL, NULL, 20, '', 0, '2026-11-11 05:28:09', '2026-11-11 05:28:09', 121, 'Membawa Barang Terlarang', '2026-11-11', 'Perlu Tindakan');
 
 -- --------------------------------------------------------
 
@@ -1576,7 +1593,7 @@ ALTER TABLE `t_guru`
 -- AUTO_INCREMENT untuk tabel `t_kategori_pelanggaran`
 --
 ALTER TABLE `t_kategori_pelanggaran`
-  MODIFY `id_kategori` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id_kategori` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_kelas`
@@ -1594,7 +1611,7 @@ ALTER TABLE `t_kelas_siswa`
 -- AUTO_INCREMENT untuk tabel `t_pelanggaran`
 --
 ALTER TABLE `t_pelanggaran`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_pelanggaran_kategori`
