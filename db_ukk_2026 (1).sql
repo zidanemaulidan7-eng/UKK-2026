@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 11 Nov 2026 pada 06.28
+-- Waktu pembuatan: 11 Nov 2026 pada 07.48
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -621,7 +621,8 @@ INSERT INTO `t_pelanggaran` (`id`, `pelanggaran_kategori_id`, `kode`, `nama`, `p
 (104, NULL, NULL, NULL, 8, '', 0, '2026-11-11 04:55:25', '2026-11-11 04:55:25', 22, 'Membawa barang terlarang #007', '2026-11-11', 'Sudah Ditindak'),
 (105, NULL, NULL, NULL, 9, '', 0, '2026-11-11 04:56:15', '2026-11-11 04:56:15', 20, 'Berkata tidak sopan #008', '2026-11-11', 'Sudah Ditindak'),
 (106, NULL, NULL, NULL, 8, '', 0, '2026-11-11 05:18:17', '2026-11-11 05:18:17', 121, 'Membawa barang terlarang #017', '2026-11-11', 'Sudah Ditindak'),
-(107, NULL, NULL, NULL, 20, '', 0, '2026-11-11 05:28:09', '2026-11-11 05:28:09', 121, 'Membawa Barang Terlarang', '2026-11-11', 'Perlu Tindakan');
+(107, NULL, NULL, NULL, 20, '', 0, '2026-11-11 05:28:09', '2026-11-11 05:28:09', 121, 'Membawa Barang Terlarang', '2026-11-11', 'Sudah Ditindak'),
+(108, NULL, NULL, NULL, 15, '', 0, '2026-11-11 05:31:47', '2026-11-11 05:31:47', 18, 'Berkelahi dengan Teman', '2026-11-11', 'Sudah Ditindak');
 
 -- --------------------------------------------------------
 
@@ -1611,7 +1612,7 @@ ALTER TABLE `t_kelas_siswa`
 -- AUTO_INCREMENT untuk tabel `t_pelanggaran`
 --
 ALTER TABLE `t_pelanggaran`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=109;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_pelanggaran_kategori`
