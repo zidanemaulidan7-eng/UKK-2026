@@ -18,11 +18,13 @@ if (!$siswa) {
 
 // Proses Update Data
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nis   = mysqli_real_escape_string($koneksi, $_POST['nis']);
-    $nama  = mysqli_real_escape_string($koneksi, $_POST['nama']);
-    // Tambahkan field lain sesuai tabel database Anda (misal: jenis_kelamin, alamat, dll)
+    $nis            = mysqli_real_escape_string($koneksi, $_POST['nis']);
+    $nama           = mysqli_real_escape_string($koneksi, $_POST['nama']);
+    $jenis_kelamin  = mysqli_real_escape_string($koneksi, $_POST['jenis_kelamin']);
+    $tanggal_lahir  = mysqli_real_escape_string($koneksi, $_POST['tanggal_lahir']);
+    $alamat         = mysqli_real_escape_string($koneksi, $_POST['alamat']);
 
-    $update = mysqli_query($koneksi, "UPDATE t_siswa SET nis = '$nis', nama = '$nama' WHERE id = $id");
+    $update = mysqli_query($koneksi, "UPDATE t_siswa SET nis = '$nis', nama = '$nama', jenis_kelamin = '$jenis_kelamin', tanggal_lahir = '$tanggal_lahir', alamat = '$alamat' WHERE id = $id");
 
     if ($update) {
         $_SESSION['pesan'] = "Data siswa berhasil diperbarui!";
@@ -60,13 +62,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <form action="" method="POST">
                         <div class="mb-3">
                             <label class="form-label">NIS</label>
-                            <!-- Menggunakan type="text" dengan inputmode agar maxlength 15 berfungsi -->
-                            <input type="text" name="nis" class="form-control" maxlength="15" inputmode="numeric" pattern="[0-9]*" value="<?= htmlspecialchars($siswa['nis']); ?>" required>
+                            <input type="text" name="nis" class="form-control" maxlength="15" value="<?= htmlspecialchars($siswa['nis']); ?>" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Nama Lengkap</label>
                             <input type="text" name="nama" class="form-control" value="<?= htmlspecialchars($siswa['nama']); ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Jenis Kelamin</label>
+                            <select name="jenis_kelamin" class="form-control" required>
+                                <option value="L" <?= ($siswa['jenis_kelamin'] == 'L') ? 'selected' : ''; ?>>Laki-laki</option>
+                                <option value="P" <?= ($siswa['jenis_kelamin'] == 'P') ? 'selected' : ''; ?>>Perempuan</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tanggal Lahir</label>
+                            <input type="date" name="tanggal_lahir" class="form-control" value="<?= htmlspecialchars($siswa['tanggal_lahir']); ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Alamat</label>
+                            <textarea name="alamat" class="form-control" rows="2"><?= htmlspecialchars($siswa['alamat']); ?></textarea>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
