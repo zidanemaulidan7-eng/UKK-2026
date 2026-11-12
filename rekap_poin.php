@@ -45,6 +45,7 @@ if ($q_all_siswa) {
             <a href="riwayat.php">Riwayat</a>
             <a href="rekap_poin.php" class="active">Rekap Poin</a>
             <hr class="dropdown-divider my-3 border-secondary">
+            <a href="pelanggaran.php">Laporan</a>
             <a href="logout.php" class="text-danger">Logout</a>
         </div>
     </div>

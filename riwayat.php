@@ -103,6 +103,7 @@ if (!$query_riwayat) {
         <a href="tindakan.php">Tindakan</a>
         <a href="riwayat.php" class="active">Riwayat</a>
         <a href="rekap_poin.php">Rekap Poin</a>
+        <a href="pelanggaran.php">Laporan</a>
         <hr class="dropdown-divider my-3 border-secondary">
         <a href="logout.php" class="text-danger">Logout</a>
     </div>

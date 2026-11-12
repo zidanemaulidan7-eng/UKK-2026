@@ -146,6 +146,11 @@ if (!$query) {
         <a href="tindakan.php" class="active">Tindakan</a>
         <a href="riwayat.php">Riwayat</a>
         <a href="rekap_poin.php">Rekap Poin</a>
+        <li class="nav-item mb-1">
+                    <a href="rekap_poin.php" class="nav-link">
+                        Laporan
+                    </a>
+                </li>
         <hr class="dropdown-divider my-3 border-secondary">
         <a href="logout.php" class="text-danger">Logout</a>
     </div>

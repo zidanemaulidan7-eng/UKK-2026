@@ -299,6 +299,10 @@ if (!$query_jp) {
                 Rekap Poin
             </a>
 
+            <a href="pelanggaran.php">
+                Laporan
+            </a>
+
             <hr class="dropdown-divider my-3 border-secondary">
 
             <a href="logout.php" class="text-danger">
