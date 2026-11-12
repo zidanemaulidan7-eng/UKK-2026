@@ -121,9 +121,6 @@ $query = mysqli_query($koneksi, $sql);
                     <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
                 </li>
                 <li class="nav-item">
-                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
-                </li>
-                <li class="nav-item">
                     <a href="tentang_saya.php" class="nav-link text-white">About Me</a>
                 </li>
                 <hr class="text-secondary">

@@ -132,7 +132,6 @@ if (!$query) {
                 <li class="nav-item"><a href="kelola_kategori_pelanggaran.php" class="nav-link">Kelola Kategori Pelanggaran</a></li>
                 <li class="nav-item"><a href="kelola_jenis_pelanggaran.php" class="nav-link">Kelola Jenis Pelanggaran</a></li>
                 <li class="nav-item"><a href="penempatan_siswa.php" class="nav-link">Penempatan Siswa</a></li>
-                <li class="nav-item"><a href="pelanggaran.php" class="nav-link">Laporan</a></li>
                 <li class="nav-item"><a href="tentang_saya.php" class="nav-link">About Me</a></li>
             </ul>
             <hr>

@@ -173,7 +173,6 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM `$nama_tabel` ORDER BY `$pk_
                     <a href="kelola_jenis_pelanggaran.php" class="nav-link btn btn-primary text-white text-start">Kelola Jenis Pelanggaran</a>
                 </li>
                 <li class="nav-item"><a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a></li>
-                <li class="nav-item"><a href="pelanggaran.php" class="nav-link text-white">Laporan</a></li>
                 <li class="nav-item"><a href="tentang_saya.php" class="nav-link text-white">About Me</a></li>
                 <hr class="text-secondary my-2">
                 <li class="nav-item"><a href="logout.php" class="nav-link text-danger">Logout</a></li>

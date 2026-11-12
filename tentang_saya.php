@@ -108,8 +108,6 @@ if ($_SESSION['role'] !== 'admin') {
                 <li class="nav-item">
                     <a href="penempatan_siswa.php" class="nav-link text-white">Penempatan Siswa</a>
                 </li>
-                <li class="nav-item">
-                    <a href="pelanggaran.php" class="nav-link text-white">Laporan</a>
                 </li>
                 <li class="nav-item">
                     <!-- Menu About Me aktif (Tombol Biru) -->
