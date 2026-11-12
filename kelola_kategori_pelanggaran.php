@@ -225,6 +225,13 @@ $query_data = mysqli_query($koneksi, "SELECT * FROM $nama_tabel ORDER BY id_kate
                                                 <label class="form-label">Deskripsi</label>
                                                 <textarea class="form-control" name="deskripsi" rows="3"><?= htmlspecialchars($row['deskripsi']); ?></textarea>
                                             </div>
+                                            <div class="mb-3">
+                        <label class="form-label">Status Aktif</label>
+                        <select name="status_aktif" class="form-control" required>
+                            <option value="1">Aktif</option>
+                            <option value="0">Tidak Aktif</option>
+                        </select>
+                    </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
