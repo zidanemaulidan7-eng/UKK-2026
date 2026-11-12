@@ -87,6 +87,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <label class="form-label">Alamat</label>
                             <textarea name="alamat" class="form-control" rows="2"><?= htmlspecialchars($siswa['alamat']); ?></textarea>
                         </div>
+                        
+                        <label class="form-label">Status Aktif</label>
+                        <select name="status_aktif" class="form-control" required>
+                            <option value="1">Aktif</option>
+                            <option value="0">Tidak Aktif</option>
+                        </select>
+                    </div>
 
                         <div class="d-flex justify-content-end gap-2">
                             <a href="kelola_siswa.php" class="btn btn-secondary">Batal</a>
