@@ -67,8 +67,11 @@ $query_kategori = mysqli_query($koneksi,$sql_kategori);
                 Pelanggaran Siswa
             </h4>
             <ul class="nav nav-pills flex-column">
-                <li class="nav-item">
-                    <a href="dashboard.php" class="nav-link text-white">Dashboard</a>
+               <li class="nav-item mb-1">
+                    <a href="dashboard_guru.php" class="nav-link active">
+                        Dashboard
+                    </a>
+                </li>
                 </li>
                 <li class="nav-item">
                     <a href="kelola_siswa.php" class="nav-link text-white">Kelola Siswa</a>
